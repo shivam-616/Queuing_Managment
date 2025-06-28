@@ -17,7 +17,8 @@
 </form>
 
 <div id="result"></div>
-<div id="notification" style="margin-top:20px; color: green; font-weight: bold;"></div>
+<div id="position" style="margin-top: 10px; font-weight: bold; color: blue;"></div>
+<div id="notification" style="margin-top: 20px; color: green; font-weight: bold;"></div>
 
 <!-- WebSocket JS dependencies -->
 <script src="https://cdn.jsdelivr.net/npm/sockjs-client@1/dist/sockjs.min.js"></script>
@@ -26,16 +27,33 @@
 <script>
     let stompClient = null;
     let currentUserName = "";
+    let myQueueNumber = -1;
 
     // Connect to WebSocket
     function connectSocket() {
-        const socket = new SockJS("http://localhost:8080/ws"); // Must match backend endpoint
+        const socket = new SockJS("http://localhost:8080/ws");
         stompClient = Stomp.over(socket);
         stompClient.connect({}, function (frame) {
             console.log("✅ Connected to WebSocket");
+
+            // Handle all queue updates (array or object)
             stompClient.subscribe("/topic/queue", function (message) {
                 const data = JSON.parse(message.body);
-                if (data.name === currentUserName) {
+
+                // ✅ 1. Case: Queue list broadcast (array)
+                if (Array.isArray(data)) {
+                    const waitingList = data.filter(user => user.status === "waiting");
+                    const myEntry = waitingList.find(user => user.name === currentUserName);
+
+                    if (myEntry) {
+                        const peopleAhead = waitingList.filter(e => e.queueNumber < myEntry.queueNumber).length;
+                        document.getElementById("position").innerText =
+                            `🕐 People ahead of you: ${peopleAhead}`;
+                    }
+                }
+
+                // ✅ 2. Case: Notification when it's user's turn
+                if (data.name === currentUserName && data.status === "called") {
                     document.getElementById("notification").innerText =
                         `🎉 ${data.name}, it's your turn! Your Queue No is ${data.queueNumber}`;
                 }
@@ -49,7 +67,7 @@
 
         const name = document.getElementById("name").value;
         const phone = document.getElementById("phone").value;
-        currentUserName = name; // Save for comparison
+        currentUserName = name;
 
         fetch("http://localhost:8080/api/queue/create", {
             method: "POST",
@@ -60,11 +78,13 @@
         })
         .then(res => res.json())
         .then(data => {
+            myQueueNumber = data.queueNumber;
             document.getElementById("result").innerHTML =
                 `<p>✅ You have joined the queue, ${data.name}. Your queue number is ${data.queueNumber}</p>`;
         })
         .catch(err => {
-            document.getElementById("result").innerHTML = `<p style="color:red;">❌ Error: ${err}</p>`;
+            document.getElementById("result").innerHTML =
+                `<p style="color:red;">❌ Error: ${err.message}</p>`;
         });
     });
 
