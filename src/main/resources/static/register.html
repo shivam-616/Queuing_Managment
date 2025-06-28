@@ -2,60 +2,73 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Join Queue</title>
-    <script src="https://cdn.jsdelivr.net/npm/sockjs-client@1/dist/sockjs.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/stompjs@2.3.3/lib/stomp.min.js"></script>
-    <style>
-        body { font-family: Arial; padding: 30px; }
-        #message { margin-top: 20px; font-size: 18px; color: green; }
-    </style>
+    <title>Register for Queue</title>
 </head>
 <body>
-
 <h2>Join the Queue</h2>
-
-<form id="queueForm">
-    <input type="text" id="name" placeholder="Enter your name" required />
-    <button type="submit">Join</button>
+<form id="registerForm">
+    <label for="name">Name:</label>
+    <input type="text" id="name" name="name" required>
+    <br><br>
+    <label for="phone">Phone:</label>
+    <input type="text" id="phone" name="phone" required>
+    <br><br>
+    <button type="submit">Register</button>
 </form>
 
-<div id="message"></div>
+<div id="result"></div>
+<div id="notification" style="margin-top:20px; color: green; font-weight: bold;"></div>
+
+<!-- WebSocket JS dependencies -->
+<script src="https://cdn.jsdelivr.net/npm/sockjs-client@1/dist/sockjs.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/stompjs@2.3.3/lib/stomp.min.js"></script>
 
 <script>
     let stompClient = null;
-    let currentUser = null;
+    let currentUserName = "";
 
-    function connectWebSocket() {
-        const socket = new SockJS('/ws');
+    // Connect to WebSocket
+    function connectSocket() {
+        const socket = new SockJS("http://localhost:8080/ws"); // Must match backend endpoint
         stompClient = Stomp.over(socket);
-
-        stompClient.connect({}, () => {
-            stompClient.subscribe('/topic/queue', (msg) => {
-                const data = JSON.parse(msg.body);
-                if (data.name === currentUser) {
-                    document.getElementById('message').textContent = `🎉 It's your turn, ${data.name}!`;
+        stompClient.connect({}, function (frame) {
+            console.log("✅ Connected to WebSocket");
+            stompClient.subscribe("/topic/queue", function (message) {
+                const data = JSON.parse(message.body);
+                if (data.name === currentUserName) {
+                    document.getElementById("notification").innerText =
+                        `🎉 ${data.name}, it's your turn! Your Queue No is ${data.queueNumber}`;
                 }
             });
         });
     }
 
-    document.getElementById('queueForm').addEventListener('submit', function (e) {
+    // Form submit logic
+    document.getElementById("registerForm").addEventListener("submit", function (e) {
         e.preventDefault();
-        const name = document.getElementById('name').value.trim();
-        if (!name) return;
 
-        fetch('/api/queue/create?name=' + encodeURIComponent(name), {
-            method: 'POST'
+        const name = document.getElementById("name").value;
+        const phone = document.getElementById("phone").value;
+        currentUserName = name; // Save for comparison
+
+        fetch("http://localhost:8080/api/queue/create", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({ name, phone })
         })
-        .then(response => response.json())
+        .then(res => res.json())
         .then(data => {
-            currentUser = data.name;
-            document.getElementById('message').textContent = `✅ You have joined the queue, ${data.name}. Your queue number is ${data.queueNumber}`;
-            connectWebSocket();
+            document.getElementById("result").innerHTML =
+                `<p>✅ You have joined the queue, ${data.name}. Your queue number is ${data.queueNumber}</p>`;
         })
-        .catch(() => alert("Error joining queue"));
+        .catch(err => {
+            document.getElementById("result").innerHTML = `<p style="color:red;">❌ Error: ${err}</p>`;
+        });
     });
-</script>
 
+    connectSocket();
+</script>
 </body>
 </html>

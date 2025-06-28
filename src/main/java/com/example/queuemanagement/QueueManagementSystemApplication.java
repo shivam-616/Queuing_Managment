@@ -16,28 +16,28 @@ public class QueueManagementSystemApplication {
         SpringApplication.run(QueueManagementSystemApplication.class, args);
     }
 
-    @Bean
-    public CommandLineRunner loadTestData(QueueEntryRepository repository) {
-        return args -> {
-            QueueEntry entry1 = QueueEntry.builder()
-                    .name("Test User 1")
-                    .phone("9999999999")
-                    .status("waiting")
-                    .queueNumber(1)
-                    .notified(false)
-                    .build();
-
-            QueueEntry entry2 = QueueEntry.builder()
-                    .name("Test User 2")
-                    .phone("8888888888")
-                    .status("waiting")
-                    .queueNumber(2)
-                    .notified(false)
-                    .build();
-
-            repository.save(entry1);
-            repository.save(entry2);
-
-        };
-    }
+//    @Bean
+//    public CommandLineRunner loadTestData(QueueEntryRepository repository) {
+//        return args -> {
+//            QueueEntry entry1 = QueueEntry.builder()
+//                    .name("Test User 1")
+//                    .phone("9999999999")
+//                    .status("waiting")
+//                    .queueNumber(1)
+//                    .notified(false)
+//                    .build();
+//
+//            QueueEntry entry2 = QueueEntry.builder()
+//                    .name("Test User 2")
+//                    .phone("8888888888")
+//                    .status("waiting")
+//                    .queueNumber(2)
+//                    .notified(false)
+//                    .build();
+//
+//            repository.save(entry1);
+//            repository.save(entry2);
+//
+//        };
+//    }
 }

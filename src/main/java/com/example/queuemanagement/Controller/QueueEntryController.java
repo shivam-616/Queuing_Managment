@@ -17,8 +17,8 @@ public class QueueEntryController {
     private final QueueEntryService queueEntryService;
 
     @PostMapping("/create")
-    public ResponseEntity<QueueEntry> createEntry(@RequestBody QueueEntryRequest name) {
-        QueueEntry entry = queueEntryService.createNewEntry(name.getName());
+    public ResponseEntity<QueueEntry> createEntry(@RequestBody QueueEntryRequest request) {
+        QueueEntry entry = queueEntryService.createNewEntry(request.getName(), request.getPhone());
         System.out.println("New entry created: " + entry);
         return ResponseEntity.ok(entry);
     }

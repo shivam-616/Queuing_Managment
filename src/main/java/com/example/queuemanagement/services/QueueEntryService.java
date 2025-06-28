@@ -45,9 +45,10 @@ public class QueueEntryService {
                 .sorted((a, b) -> Integer.compare(a.getQueueNumber(), b.getQueueNumber()))
                 .findFirst();
     }
-    public QueueEntry createNewEntry(String name) {
+    public QueueEntry createNewEntry(String name ,String phone) {
         QueueEntry entry = new QueueEntry();
         entry.setName(name);
+        entry.setPhone(phone);
         entry.setStatus("waiting");
         entry.setQueueNumber(calculateNextQueueNumber());
         return repository.save(entry);
