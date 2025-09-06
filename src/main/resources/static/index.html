@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Create a New Queue</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+    </style>
+</head>
+<body class="bg-gray-100 flex items-center justify-center h-screen">
+<div class="w-full max-w-md bg-white p-8 rounded-lg shadow-md">
+    <h2 class="text-2xl font-bold mb-6 text-center text-gray-800">Create a New Queue</h2>
+    <form id="createQueueForm">
+        <div class="mb-4">
+            <label for="queueName" class="block text-gray-700 text-sm font-bold mb-2">Queue Name:</label>
+            <input type="text" id="queueName" name="queueName" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" required placeholder="e.g., Doctor's Appointment">
+        </div>
+        <div class="mb-6">
+            <label for="userDetails" class="block text-gray-700 text-sm font-bold mb-2">User Details to Collect (comma-separated):</label>
+            <input type="text" id="userDetails" name="userDetails" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 mb-3 leading-tight focus:outline-none focus:shadow-outline" placeholder="e.g., Name, Phone, Email" value="Name, Phone" required>
+            <p class="text-xs text-gray-500">Specify the information you need from people joining the queue.</p>
+        </div>
+        <div class="flex items-center justify-center">
+            <button type="submit" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline">
+                Create Queue
+            </button>
+        </div>
+    </form>
+</div>
+
+<script>
+    document.getElementById("createQueueForm").addEventListener("submit", function(e) {
+        e.preventDefault();
+        const queueName = document.getElementById("queueName").value;
+        const userDetails = document.getElementById("userDetails").value;
+        const queueId = queueName.replace(/\s+/g, '-').toLowerCase();
+
+        const params = new URLSearchParams();
+        params.append('id', queueId);
+        params.append('name', queueName);
+        params.append('details', userDetails);
+
+        const destinationUrl = `queue-links.html?${params.toString()}`;
+        window.location.href = destinationUrl;
+    });
+</script>
+</body>
+</html>
+
