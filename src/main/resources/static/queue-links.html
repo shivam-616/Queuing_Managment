@@ -3,29 +3,53 @@
 <head>
     <meta charset="UTF-8">
     <title>Queue Links</title>
+    <!-- Tailwind CSS for styling -->
     <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts for a modern look -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
+        /* Use the Inter font family */
         body { font-family: 'Inter', sans-serif; }
+        /* Ensure long links wrap correctly and don't overflow their container */
         .link-box { word-wrap: break-word; }
     </style>
 </head>
-<body class="bg-gray-100 flex items-center justify-center h-screen">
-<div class="w-full max-w-xl bg-white p-8 rounded-lg shadow-md text-center">
-    <h2 class="text-2xl font-bold mb-2 text-gray-800">Queue Created Successfully!</h2>
-    <p class="text-gray-600 mb-6">Share these links with users and administrators.</p>
+<body class="bg-gray-100 flex items-center justify-center min-h-screen">
+<div class="w-full max-w-2xl bg-white p-8 md:p-10 rounded-xl shadow-lg text-center">
 
-    <div class="space-y-4 text-left">
+    <!-- Success Icon -->
+    <div class="mx-auto flex items-center justify-center h-12 w-12 rounded-full bg-green-100">
+        <svg class="h-6 w-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+    </div>
+
+    <h2 class="text-3xl font-bold mt-4 mb-2 text-gray-800">Queue Created Successfully!</h2>
+    <p class="text-gray-600 mb-8">Share these links with your users and administrators.</p>
+
+    <div class="space-y-6 text-left">
+        <!-- User Registration Link -->
         <div>
-            <label class="font-bold text-gray-700">User Registration Link:</label>
-            <div class="mt-1 p-3 bg-gray-200 rounded link-box">
-                <a id="userLink" href="#" class="text-blue-600 hover:underline"></a>
+            <label class="font-semibold text-gray-700">User Registration Link:</label>
+            <p class="text-sm text-gray-500">Users can join the queue by visiting this link.</p>
+            <div class="mt-2 p-3 bg-gray-100 border border-gray-200 rounded-md link-box">
+                <a id="userLink" href="#" class="text-indigo-600 hover:underline"></a>
             </div>
         </div>
+
+        <!-- Admin Page Link -->
         <div>
-            <label class="font-bold text-gray-700">Admin Page Link:</label>
-            <div class="mt-1 p-3 bg-gray-200 rounded link-box">
-                <a id="adminLink" href="#" class="text-blue-600 hover:underline"></a>
+            <label class="font-semibold text-gray-700">Admin Page Link:</label>
+            <p class="text-sm text-gray-500">Use this link to manage the queue and call the next person.</p>
+            <div class="mt-2 p-3 bg-gray-100 border border-gray-200 rounded-md link-box">
+                <a id="adminLink" href="#" class="text-indigo-600 hover:underline"></a>
+            </div>
+        </div>
+
+        <!-- Visitor QR Code Link Section -->
+        <div class="border-t border-gray-200 pt-6 mt-6">
+            <label class="font-semibold text-gray-700">Visitor QR Code Link:</label>
+            <p class="text-sm text-gray-500">Display this QR code for easy scanning and queue entry.</p>
+            <div class="mt-2 p-3 bg-gray-100 border border-gray-200 rounded-md link-box">
+                <a id="qrLink" href="#" target="_blank" class="text-indigo-600 hover:underline font-medium">Click here to open and display the QR Code</a>
             </div>
         </div>
     </div>
@@ -33,22 +57,39 @@
 
 <script>
     window.onload = function() {
+        // Parse URL parameters from the previous page (index.html)
         const params = new URLSearchParams(window.location.search);
         const queueId = params.get('id');
         const queueName = params.get('name');
         const userDetails = params.get('details');
 
         if (queueId) {
+            // 1. Construct the relative URLs for navigating within the site
             const userLinkHref = `register.html?id=${encodeURIComponent(queueId)}&name=${encodeURIComponent(queueName)}&details=${encodeURIComponent(userDetails)}`;
             const adminLinkHref = `admin.html?id=${encodeURIComponent(queueId)}&name=${encodeURIComponent(queueName)}`;
 
-            const userLink = document.getElementById("userLink");
-            userLink.href = userLinkHref;
-            userLink.textContent = window.location.origin + '/' + userLinkHref;
+            // 2. Construct the full, absolute URLs. This is essential for the QR code to work from any device.
+            // It combines the current page's origin with the relative path.
+            const fullUserUrl = new URL(userLinkHref, window.location.href).href;
+            const fullAdminUrl = new URL(adminLinkHref, window.location.href).href;
 
-            const adminLink = document.getElementById("adminLink");
-            adminLink.href = adminLinkHref;
-            adminLink.textContent = window.location.origin + '/' + adminLinkHref;
+            // 3. Populate the user and admin links on the page for display and navigation
+            const userLinkElement = document.getElementById("userLink");
+            userLinkElement.href = userLinkHref;
+            userLinkElement.textContent = fullUserUrl;
+
+            const adminLinkElement = document.getElementById("adminLink");
+            adminLinkElement.href = adminLinkHref;
+            adminLinkElement.textContent = fullAdminUrl;
+
+            // 4. Create the link to our backend QR code generator endpoint (/api/qr/generate)
+            // We pass the full user URL to the backend, which will then encode it into the QR image.
+            const qrLinkHref = `/api/qr/generate?url=${encodeURIComponent(fullUserUrl)}`;
+            const qrLinkElement = document.getElementById("qrLink");
+            qrLinkElement.href = qrLinkHref;
+        } else {
+            // Handle the case where the parameters are missing
+            document.querySelector('.w-full').innerHTML = '<h2 class="text-2xl font-bold text-red-600">Error: Queue information not found. Please create a queue first.</h2>';
         }
     };
 </script>
