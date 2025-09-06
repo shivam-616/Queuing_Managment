@@ -1,53 +1,75 @@
-Real-Time Queue Management System
-This is a full-stack, real-time queue management system built with Java Spring Boot and vanilla HTML/CSS/JavaScript. It allows users to dynamically create custom queues, share joining links, and manage the queue from a dedicated admin panel.
+# Real-Time Queue Management System
 
-Key Features
-Dynamic Queue Creation: Create queues on the fly with custom names and user information fields.
+A full-stack, real-time queue management system built with Java Spring Boot and vanilla HTML/CSS/JavaScript. The system enables dynamic queue creation, real-time updates via WebSockets, and comprehensive admin controls.
 
-Real-Time Updates: Uses WebSockets (with STOMP) for instant updates on all connected clients.
+## Features
 
-Admin Dashboard: A separate view for administrators to see the waiting list and call the next person.
+- **Dynamic Queue Creation**: Create custom queues with configurable user information fields
+- **Real-Time Updates**: WebSocket integration with STOMP for instant client synchronization
+- **Admin Dashboard**: Dedicated panel for queue management and customer calling
+- **QR Code Generation**: Automatic QR codes for contactless queue joining
+- **RESTful API**: Versioned API with comprehensive documentation
 
-QR Code Generation: Automatically generates a QR code for visitors to easily scan and join the queue.
+## Technology Stack
 
-RESTful API: A versioned, well-structured API for all backend operations.
+| Component | Technology |
+|-----------|------------|
+| Backend | Java 17, Spring Boot 3 |
+| Database | MySQL |
+| Real-Time | Spring WebSockets, STOMP |
+| Frontend | HTML5, Tailwind CSS, JavaScript |
+| Documentation | Springdoc OpenAPI (Swagger UI) |
+| Deployment | Docker, Render |
 
-Technology Stack
-Backend: Java 17, Spring Boot 3
+## Installation
 
-Database: MySQL
+### Prerequisites
+- Java 17+
+- MySQL 8.0+
+- Maven 3.6+
 
-Real-Time: Spring WebSockets, STOMP
+### Setup
 
-Frontend: HTML5, Tailwind CSS, JavaScript
+1. **Clone Repository**
+   ```bash
+   git clone https://github.com/shivam-616/Queuing_Managment.git
+   cd Queuing_Managment
+   ```
 
-API Documentation: Springdoc OpenAPI (Swagger UI)
+2. **Database Configuration**
+   ```sql
+   CREATE DATABASE entry_db;
+   ```
+   Update credentials in `src/main/resources/application.properties`
 
-Deployment: Docker (Ready), Render (Recommended)
+3. **Run Application**
+   ```bash
+   mvn spring-boot:run
+   ```
 
-How to Run Locally
-Clone the repository:
+4. **Access Points**
+   - Application: http://localhost:8080
+   - API Documentation: http://localhost:8080/swagger-ui.html
 
-git clone https://github.com/shivam-616/Queuing_Managment.git
+## Docker Deployment
 
-Set up your database:
+```bash
+docker build -t queue-management-system .
+docker run -p 8080:8080 queue-management-system
+```
 
-Make sure you have MySQL installed and running.
+## API Documentation
 
-Create a database named entry_db.
+Interactive API documentation is available at `/swagger-ui.html` when the application is running.
 
-Update the database credentials in src/main/resources/application.properties.
+## Contributing
 
-Run the application:
+1. Fork the repository
+2. Create feature branch (`git checkout -b feature/NewFeature`)
+3. Commit changes (`git commit -m 'Add NewFeature'`)
+4. Push to branch (`git push origin feature/NewFeature`)
+5. Create Pull Request
 
-You can run the QueueManagementSystemApplication.java file from your IDE or use Maven:
+## Author
 
-mvn spring-boot:run
-
-Access the application:
-
-Open your browser and go to http://localhost:8080.
-
-API Documentation
-Once the application is running, you can view the interactive API documentation (Swagger UI) at:
-http://localhost:8080/swagger-ui.html
+**[Shivam](https://github.com/shivam-616)**
