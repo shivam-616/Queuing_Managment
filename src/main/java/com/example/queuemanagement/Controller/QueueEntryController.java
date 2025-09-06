@@ -11,38 +11,22 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/queue")
+@RequestMapping("/api/queue/{queueId}")
 @RequiredArgsConstructor
 public class QueueEntryController {
     private final QueueEntryService queueEntryService;
 
     @PostMapping("/create")
-    public ResponseEntity<QueueEntry> createEntry(@RequestBody QueueEntryRequest request) {
-        QueueEntry entry = queueEntryService.createNewEntry(request.getName(), request.getPhone());
-        System.out.println("New entry created: " + entry);
+    public ResponseEntity<QueueEntry> createEntry(@PathVariable String queueId, @RequestBody QueueEntryRequest request) {
+        QueueEntry entry = queueEntryService.createNewEntry(queueId, request.getDetails());
         return ResponseEntity.ok(entry);
     }
 
-    // Get all entriesz
     @GetMapping("/all")
-    public ResponseEntity<List<QueueEntry>> getAllEntries() {
-        return ResponseEntity.ok(queueEntryService.getAllEntries());
-    }
-
-    // Get the next waiting entry
-    @GetMapping("/next")
-    public ResponseEntity<QueueEntry> getNextEntry() {
-        return queueEntryService.getNextWaitingEntry()
-                .map(ResponseEntity::ok)
-                .orElse(ResponseEntity.noContent().build());
-    }
-
-    // Update status of an entry
-    @PutMapping("/update-status/{id}")
-    public ResponseEntity<QueueEntry> updateStatus(@PathVariable Long id, @RequestParam String status) {
-        QueueEntry updated = queueEntryService.updateStatus(id, status);
-        return ResponseEntity.ok(updated);
+    public ResponseEntity<List<QueueEntry>> getAllEntries(@PathVariable String queueId) {
+        return ResponseEntity.ok(queueEntryService.getAllEntriesByQueueId(queueId));
     }
 }
+
 
 

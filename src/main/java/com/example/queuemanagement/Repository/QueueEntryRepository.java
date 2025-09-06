@@ -10,4 +10,5 @@ public interface QueueEntryRepository extends JpaRepository<QueueEntry, Long> {
     // Custom query methods can be defined here if needed
     // For example, to find all entries by a specific attribute
     Optional<QueueEntry> findByQueueNumber(int queueNumber);
+    List<QueueEntry> findAllByQueueId(String queueId);
 }

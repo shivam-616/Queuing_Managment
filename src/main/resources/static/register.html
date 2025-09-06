@@ -2,93 +2,116 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Register for Queue</title>
+    <title>Join Queue</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>body { font-family: 'Inter', sans-serif; }</style>
 </head>
-<body>
-<h2>Join the Queue</h2>
-<form id="registerForm">
-    <label for="name">Name:</label>
-    <input type="text" id="name" name="name" required>
-    <br><br>
-    <label for="phone">Phone:</label>
-    <input type="text" id="phone" name="phone" required>
-    <br><br>
-    <button type="submit">Register</button>
-</form>
+<body class="bg-gray-100 flex items-center justify-center h-screen">
+<div class="w-full max-w-md bg-white p-8 rounded-lg shadow-md">
+    <h2 class="text-2xl font-bold mb-2 text-center text-gray-800">Join Queue: <span id="queueName"></span></h2>
 
-<div id="result"></div>
-<div id="position" style="margin-top: 10px; font-weight: bold; color: blue;"></div>
-<div id="notification" style="margin-top: 20px; color: green; font-weight: bold;"></div>
+    <form id="registerForm" class="hidden">
+        <!-- Dynamic fields will be inserted here -->
+        <div id="dynamic-fields" class="mb-4"></div>
+        <button type="submit" class="w-full bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline">
+            Join Queue
+        </button>
+    </form>
 
-<!-- WebSocket JS dependencies -->
+    <div id="result" class="mt-4 text-center"></div>
+    <div id="position" class="mt-2 text-center font-semibold text-blue-600"></div>
+    <div id="notification" class="mt-4 text-center text-2xl font-bold text-green-600"></div>
+</div>
+
 <script src="https://cdn.jsdelivr.net/npm/sockjs-client@1/dist/sockjs.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/stompjs@2.3.3/lib/stomp.min.js"></script>
 
 <script>
-    let stompClient = null;
-    let currentUserName = "";
-    let myQueueNumber = -1;
+    const params = new URLSearchParams(window.location.search);
+    const queueId = params.get('id');
+    const queueName = params.get('name');
+    const userDetails = params.get('details');
 
-    // Connect to WebSocket
+    let stompClient = null;
+    let myQueueEntry = null;
+
+    document.getElementById('queueName').textContent = queueName || 'Unnamed Queue';
+
     function connectSocket() {
-        const socket = new SockJS("http://localhost:8080/ws");
+        const socket = new SockJS("/ws");
         stompClient = Stomp.over(socket);
         stompClient.connect({}, function (frame) {
-            console.log("✅ Connected to WebSocket");
-
-            // Handle all queue updates (array or object)
-            stompClient.subscribe("/topic/queue", function (message) {
-                const data = JSON.parse(message.body);
-
-                // ✅ 1. Case: Queue list broadcast (array)
-                if (Array.isArray(data)) {
-                    const waitingList = data.filter(user => user.status === "waiting");
-                    const myEntry = waitingList.find(user => user.name === currentUserName);
-
-                    if (myEntry) {
-                        const peopleAhead = waitingList.filter(e => e.queueNumber < myEntry.queueNumber).length;
-                        document.getElementById("position").innerText =
-                            `🕐 People ahead of you: ${peopleAhead}`;
-                    }
-                }
-
-                // ✅ 2. Case: Notification when it's user's turn
-                if (data.name === currentUserName && data.status === "called") {
-                    document.getElementById("notification").innerText =
-                        `🎉 ${data.name}, it's your turn! Your Queue No is ${data.queueNumber}`;
+            console.log("Connected to WebSocket");
+            stompClient.subscribe(`/topic/queue/${queueId}`, function (message) {
+                const queue = JSON.parse(message.body);
+                updateQueuePosition(queue);
+            });
+            stompClient.subscribe(`/topic/called/${queueId}/${myQueueEntry?.id}`, function (message) {
+                const calledEntry = JSON.parse(message.body);
+                if (calledEntry.id === myQueueEntry.id) {
+                     document.getElementById("notification").innerText = `🎉 It's your turn! Your Queue No is ${calledEntry.queueNumber}`;
                 }
             });
         });
     }
 
-    // Form submit logic
+    function updateQueuePosition(queue) {
+        if (!myQueueEntry) return;
+
+        const waitingList = queue.filter(user => user.status === "waiting");
+        const myEntry = waitingList.find(user => user.id === myQueueEntry.id);
+
+        if (myEntry) {
+            const peopleAhead = waitingList.filter(e => e.queueNumber < myEntry.queueNumber).length;
+            document.getElementById("position").innerText = `People ahead of you: ${peopleAhead}`;
+        } else {
+             const myCalledEntry = queue.find(user => user.id === myQueueEntry.id && user.status === 'called');
+            if(!myCalledEntry){
+                document.getElementById("position").innerText = "You have been served.";
+            }
+        }
+    }
+
+    if (userDetails) {
+        document.getElementById('registerForm').classList.remove('hidden');
+        const fieldsContainer = document.getElementById('dynamic-fields');
+        const fields = userDetails.split(',').map(s => s.trim());
+
+        fields.forEach(field => {
+            const fieldName = field.toLowerCase().replace(/\s+/g, '');
+            const div = document.createElement('div');
+            div.className = 'mb-4';
+            div.innerHTML = `
+                <label for="${fieldName}" class="block text-gray-700 text-sm font-bold mb-2">${field}:</label>
+                <input type="text" id="${fieldName}" name="${fieldName}" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" required>
+            `;
+            fieldsContainer.appendChild(div);
+        });
+    }
+
     document.getElementById("registerForm").addEventListener("submit", function (e) {
         e.preventDefault();
+        const formData = new FormData(e.target);
+        const details = Object.fromEntries(formData.entries());
 
-        const name = document.getElementById("name").value;
-        const phone = document.getElementById("phone").value;
-        currentUserName = name;
-
-        fetch("http://localhost:8080/api/queue/create", {
+        fetch(`/api/queue/${queueId}/create`, {
             method: "POST",
-            headers: {
-                "Content-Type": "application/json"
-            },
-            body: JSON.stringify({ name, phone })
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ details })
         })
         .then(res => res.json())
         .then(data => {
-            myQueueNumber = data.queueNumber;
-            document.getElementById("result").innerHTML =
-                `<p>✅ You have joined the queue, ${data.name}. Your queue number is ${data.queueNumber}</p>`;
+            myQueueEntry = data;
+            document.getElementById("registerForm").classList.add('hidden');
+            document.getElementById("result").innerHTML = `<p class="text-green-600 font-semibold">✅ You have joined the queue. Your queue number is ${data.queueNumber}</p>`;
+            connectSocket();
         })
         .catch(err => {
-            document.getElementById("result").innerHTML =
-                `<p style="color:red;">❌ Error: ${err.message}</p>`;
+            document.getElementById("result").innerHTML = `<p style="color:red;">❌ Error: ${err.message}</p>`;
         });
     });
-
-    connectSocket();
 </script>
 </body>
 </html>
+

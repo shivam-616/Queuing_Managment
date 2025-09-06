@@ -1,22 +1,35 @@
 package com.example.queuemanagement.Controller;
 
+import com.example.queuemanagement.entites.QueueEntry;
+import com.example.queuemanagement.services.QueueEntryService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.Optional;
+
 @RestController
-@RequestMapping("/api/admin")
+@RequestMapping("/api/admin/{queueId}")
 @RequiredArgsConstructor
 public class AdminController {
 
+    private final QueueEntryService queueEntryService;
     private final QueueWebSocketController queueWebSocketController;
 
-    // Admin hits this to call the next person
     @PostMapping("/next")
-    public ResponseEntity<String> callNextPerson() {
-        queueWebSocketController.notifyNextPerson();
-        return ResponseEntity.ok("✅ Next person has been notified.");
+    public ResponseEntity<?> callNextPerson(@PathVariable String queueId) {
+        Optional<QueueEntry> nextEntryOpt = queueEntryService.getNextWaitingEntry(queueId);
+
+        if (nextEntryOpt.isPresent()) {
+            QueueEntry nextEntry = nextEntryOpt.get();
+            QueueEntry calledEntry = queueEntryService.updateStatus(nextEntry.getId(), "called");
+            queueWebSocketController.notifyUserAndBroadcastUpdate(queueId, calledEntry);
+            return ResponseEntity.ok(calledEntry);
+        } else {
+            return ResponseEntity.status(404).body("No one is waiting in the queue.");
+        }
     }
 }
