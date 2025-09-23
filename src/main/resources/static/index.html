@@ -2,32 +2,67 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Create a New Queue</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
-        body {
-            font-family: 'Inter', sans-serif;
-        }
+        body { font-family: 'Inter', sans-serif; }
     </style>
 </head>
-<body class="bg-gray-100 flex items-center justify-center h-screen">
-<div class="w-full max-w-md bg-white p-8 rounded-lg shadow-md">
-    <h2 class="text-2xl font-bold mb-6 text-center text-gray-800">Create a New Queue</h2>
+<body class="bg-slate-100 flex items-center justify-center min-h-screen p-4">
+
+<div class="w-full max-w-lg bg-white p-8 sm:p-12 rounded-2xl shadow-xl">
+
+    <div class="text-center mb-10">
+        <div class="mx-auto flex items-center justify-center h-12 w-12 rounded-full bg-indigo-100">
+            <svg class="h-6 w-6 text-indigo-600" xmlns="http://www.w.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4" />
+            </svg>
+        </div>
+        <h1 class="text-3xl font-bold mt-4 text-gray-900">Create a New Queue</h1>
+        <p class="mt-2 text-slate-600">Fill out the details below to get started.</p>
+    </div>
+
     <form id="createQueueForm">
-        <div class="mb-4">
-            <label for="queueName" class="block text-gray-700 text-sm font-bold mb-2">Queue Name:</label>
-            <input type="text" id="queueName" name="queueName" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" required placeholder="e.g., Doctor's Appointment">
-        </div>
-        <div class="mb-6">
-            <label for="userDetails" class="block text-gray-700 text-sm font-bold mb-2">User Details to Collect (comma-separated):</label>
-            <input type="text" id="userDetails" name="userDetails" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 mb-3 leading-tight focus:outline-none focus:shadow-outline" placeholder="e.g., Name, Phone, Email" value="Name, Phone" required>
-            <p class="text-xs text-gray-500">Specify the information you need from people joining the queue.</p>
-        </div>
-        <div class="flex items-center justify-center">
-            <button type="submit" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline">
-                Create Queue
-            </button>
+        <div class="space-y-6">
+
+            <div>
+                <label for="queueName" class="block text-sm font-medium text-slate-700">Queue Name</label>
+                <div class="mt-1 relative">
+                    <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                        <svg class="h-5 w-5 text-slate-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                            <path fill-rule="evenodd" d="M17.707 9.293a1 1 0 010 1.414l-7 7a1 1 0 01-1.414 0l-7-7a1 1 0 011.414-1.414L10 14.586l6.293-6.293a1 1 0 011.414 0z" clip-rule="evenodd" />
+                        </svg>
+                    </div>
+                    <input type="text" id="queueName" name="queueName" class="block w-full pl-10 pr-3 py-2 bg-slate-50 border border-slate-300 rounded-md text-slate-900 placeholder-slate-400 focus:outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500" required placeholder="e.g., Doctor's Appointment">
+                </div>
+            </div>
+
+            <div>
+                <label for="userDetails" class="block text-sm font-medium text-slate-700">User Details to Collect</label>
+                <div class="mt-1 relative">
+                    <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                        <svg class="h-5 w-5 text-slate-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                            <path d="M9 2a1 1 0 000 2h2a1 1 0 100-2H9z" />
+                            <path fill-rule="evenodd" d="M4 5a2 2 0 012-2h8a2 2 0 012 2v10a2 2 0 01-2 2H6a2 2 0 01-2-2V5zm3 4a1 1 0 011-1h2a1 1 0 110 2H8a1 1 0 01-1-1zm-1 4a1 1 0 100 2h6a1 1 0 100-2H6z" clip-rule="evenodd" />
+                        </svg>
+                    </div>
+                    <input type="text" id="userDetails" name="userDetails" class="block w-full pl-10 pr-3 py-2 bg-slate-50 border border-slate-300 rounded-md text-slate-900 placeholder-slate-400 focus:outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500" placeholder="e.g., Name, Phone, Email" value="Name, Phone" required>
+                </div>
+                <p class="mt-2 text-xs text-slate-500">Comma-separated values for the info you need from people.</p>
+            </div>
+
+            <div>
+                <button type="submit" class="w-full flex justify-center items-center gap-2 py-3 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-transform transform hover:scale-105">
+                    <span>Create Queue & Get Links</span>
+                    <svg class="h-5 w-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                        <path fill-rule="evenodd" d="M10.293 3.293a1 1 0 011.414 0l6 6a1 1 0 010 1.414l-6 6a1 1 0 01-1.414-1.414L14.586 11H3a1 1 0 110-2h11.586l-4.293-4.293a1 1 0 010-1.414z" clip-rule="evenodd" />
+                    </svg>
+                </button>
+            </div>
         </div>
     </form>
 </div>
@@ -50,4 +85,3 @@
 </script>
 </body>
 </html>
-

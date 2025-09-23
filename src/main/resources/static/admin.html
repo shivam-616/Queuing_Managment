@@ -2,37 +2,76 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Admin - Queue Management</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <style>body { font-family: 'Inter', sans-serif; }</style>
+    <style>
+        body { font-family: 'Inter', sans-serif; }
+        /* Smooth transitions for a better feel */
+        #notification, .user-card { transition: all 0.3s ease-in-out; }
+    </style>
 </head>
-<body class="bg-gray-100 p-8">
-<div class="max-w-4xl mx-auto bg-white p-6 rounded-lg shadow-md">
-    <h2 class="text-2xl font-bold mb-4">Admin: <span id="queueName"></span></h2>
+<body class="bg-slate-100">
 
-    <button id="callNext" class="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline mb-4">
-        Call Next Person
-    </button>
+<div class="max-w-7xl mx-auto p-4 sm:p-6 lg:p-8">
 
-    <div id="notification" class="mb-4 text-center font-semibold text-blue-600"></div>
-
-    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+    <header class="bg-white rounded-lg shadow-lg p-6 mb-8 flex flex-col sm:flex-row justify-between items-center gap-4">
         <div>
-            <h3 class="font-bold text-lg mb-2">Waiting List</h3>
-            <div id="waiting-list" class="space-y-2"></div>
+            <h1 class="text-3xl font-bold text-gray-900">Queue Management</h1>
+            <p class="text-slate-600 mt-1">Admin Panel for: <strong id="queueName" class="font-semibold text-indigo-600"></strong></p>
         </div>
+        <button id="callNext" class="w-full sm:w-auto flex items-center justify-center gap-2 bg-green-600 hover:bg-green-700 text-white font-bold py-3 px-6 rounded-lg focus:outline-none focus:ring-4 focus:ring-green-300 transition-transform transform hover:scale-105">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M11 15l-3-3m0 0l3-3m-3 3h8M3 12a9 9 0 1118 0 9 9 0 01-18 0z" />
+            </svg>
+            <span>Call Next Person</span>
+        </button>
+    </header>
+
+    <div id="notification" class="mb-6 p-4 rounded-md text-center font-semibold hidden"></div>
+
+    <main class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+
         <div>
-            <h3 class="font-bold text-lg mb-2">Already Called</h3>
-            <div id="called-list" class="space-y-2"></div>
+            <div class="flex justify-between items-center mb-4 pb-2 border-b-2 border-slate-200">
+                <h2 class="text-xl font-bold text-slate-800">Waiting List</h2>
+                <span id="waitingCount" class="bg-sky-200 text-sky-800 text-sm font-bold px-3 py-1 rounded-full">0</span>
+            </div>
+            <div id="waiting-list" class="space-y-4">
+                <div id="waiting-empty-state" class="text-center p-10 bg-white rounded-lg shadow">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="mx-auto h-12 w-12 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                    <h3 class="mt-2 text-sm font-medium text-gray-900">Queue is empty</h3>
+                    <p class="mt-1 text-sm text-gray-500">New users will appear here when they join.</p>
+                </div>
+            </div>
         </div>
-    </div>
+
+        <div>
+            <div class="flex justify-between items-center mb-4 pb-2 border-b-2 border-slate-200">
+                <h2 class="text-xl font-bold text-slate-800">Already Called</h2>
+                <span id="calledCount" class="bg-slate-200 text-slate-800 text-sm font-bold px-3 py-1 rounded-full">0</span>
+            </div>
+            <div id="called-list" class="space-y-4">
+                <div id="called-empty-state" class="text-center p-10 bg-white rounded-lg shadow">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="mx-auto h-12 w-12 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                    <h3 class="mt-2 text-sm font-medium text-gray-900">No one has been called</h3>
+                    <p class="mt-1 text-sm text-gray-500">Called users will appear in this list.</p>
+                </div>
+            </div>
+        </div>
+    </main>
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/sockjs-client@1/dist/sockjs.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/stompjs@2.3.3/lib/stomp.min.js"></script>
 
 <script>
+    // --- YOUR ORIGINAL LOGIC IS PRESERVED BELOW ---
+    // --- MODIFICATIONS WERE MADE ONLY TO RENDER THE NEW, ENHANCED UI ELEMENTS ---
+
     const params = new URLSearchParams(window.location.search);
     const queueId = params.get('id');
     const queueName = params.get('name');
@@ -46,27 +85,44 @@
         waitingList.innerHTML = "";
         calledList.innerHTML = "";
 
-        if (!queue || queue.length === 0) {
-            waitingList.innerHTML = '<p class="text-gray-500">The queue is empty.</p>';
-            return;
-        }
+        let waitingCount = 0;
+        let calledCount = 0;
 
-        queue.forEach(user => {
+        (queue || []).forEach(user => {
             const detailsHtml = Object.entries(user.details)
-                .map(([key, value]) => `<strong>${key}:</strong> ${value}`)
-                .join(', ');
+                .map(([key, value]) => `<p class="text-sm text-slate-600"><span class="font-medium capitalize text-slate-800">${key}:</span> ${value}</p>`)
+                .join('');
+
+            // --- NEW, improved card design ---
             const userCard = `
-                <div class="p-3 rounded-md shadow-sm ${user.status === 'waiting' ? 'bg-yellow-100' : 'bg-gray-200 text-gray-500'}">
-                    <p class="font-bold text-lg">#${user.queueNumber}</p>
-                    <p>${detailsHtml}</p>
+                <div class="user-card bg-white p-4 rounded-lg shadow-md border-l-4 ${user.status === 'waiting' ? 'border-sky-500' : 'border-slate-400 opacity-70'}">
+                    <div class="flex items-center justify-between">
+                        <span class="font-bold text-xl ${user.status === 'waiting' ? 'text-sky-700' : 'text-slate-600'}">#${user.queueNumber}</span>
+                    </div>
+                    <div class="mt-2">${detailsHtml}</div>
                 </div>`;
 
             if (user.status === 'waiting') {
                 waitingList.innerHTML += userCard;
+                waitingCount++;
             } else {
                 calledList.innerHTML += userCard;
+                calledCount++;
             }
         });
+
+        // Update counters
+        document.getElementById('waitingCount').textContent = waitingCount;
+        document.getElementById('calledCount').textContent = calledCount;
+
+        // Show/hide empty states
+        document.getElementById('waiting-empty-state').style.display = waitingCount === 0 ? 'block' : 'none';
+        document.getElementById('called-empty-state').style.display = calledCount === 0 ? 'block' : 'none';
+
+        // If the list was empty before but now has items, we need to add the empty state back in.
+        if (waitingCount > 0) waitingList.querySelector('#waiting-empty-state')?.remove(); else if (!waitingList.querySelector('#waiting-empty-state')) waitingList.innerHTML = document.getElementById('waiting-empty-state').outerHTML;
+        if (calledCount > 0) calledList.querySelector('#called-empty-state')?.remove(); else if (!calledList.querySelector('#called-empty-state')) calledList.innerHTML = document.getElementById('called-empty-state').outerHTML;
+
     }
 
     function connectSocket() {
@@ -78,31 +134,37 @@
                 const queue = JSON.parse(message.body);
                 renderQueue(queue);
             });
-
             fetchInitialQueueState();
         });
     }
 
     function fetchInitialQueueState() {
-        fetch(`/api/queue/${queueId}/all`)
-            .then(res => res.json())
-            .then(renderQueue);
+        fetch(`/api/queue/${queueId}/all`).then(res => res.json()).then(renderQueue);
+    }
+
+    function showNotification(message, isError = false) {
+        const notification = document.getElementById("notification");
+        notification.textContent = message;
+        notification.classList.remove('hidden', 'bg-green-100', 'text-green-800', 'bg-red-100', 'text-red-800');
+        if (isError) {
+            notification.classList.add('bg-red-100', 'text-red-800');
+        } else {
+            notification.classList.add('bg-green-100', 'text-green-800');
+        }
     }
 
     document.getElementById("callNext").addEventListener("click", function () {
         fetch(`/api/admin/${queueId}/next`, { method: "POST" })
         .then(res => {
-            if (!res.ok) {
-                return res.text().then(text => { throw new Error(text) });
-            }
+            if (!res.ok) return res.text().then(text => { throw new Error(text) });
             return res.json();
         })
         .then(calledUser => {
             const name = calledUser.details.name || 'User';
-            document.getElementById("notification").innerText = `✅ Called #${calledUser.queueNumber}: ${name}.`;
+            showNotification(`✅ Called #${calledUser.queueNumber}: ${name}.`);
         })
         .catch(err => {
-            document.getElementById("notification").innerText = `ℹ️ ${err.message}`;
+            showNotification(`ℹ️ ${err.message}`, true);
         });
     });
 
@@ -110,4 +172,3 @@
 </script>
 </body>
 </html>
-
