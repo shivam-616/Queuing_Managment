@@ -1,0 +1,39 @@
+services:
+  # The SERVICE NAME for the database is "mysql"
+  mysql:
+    image: mysql:latest
+    container_name: mysql-queue-db # This is just a friendly name
+    restart: unless-stopped
+    environment:
+      MYSQL_ROOT_PASSWORD: 121@shivam
+      MYSQL_DATABASE: entry_db # Corrected from entry-db
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+    networks:
+      - queue-net
+
+  # The SERVICE NAME for your application is "queue-management-system"
+  queue-management-system:
+    build: .
+    container_name: queue-management-system
+    restart: on-failure
+    ports:
+      - "8080:8080"
+    depends_on:
+      - mysql # <-- CORRECTED: Must use the SERVICE NAME "mysql"
+    environment:
+      # The hostname here MUST also be the SERVICE NAME "mysql"
+      - SPRING_DATASOURCE_URL=jdbc:mysql://mysql:3306/entry_db?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC
+      - SPRING_DATASOURCE_USERNAME=root
+      - SPRING_DATASOURCE_PASSWORD=121@shivam
+    networks:
+      - queue-net
+
+networks:
+  queue-net:
+    driver: bridge
+
+volumes:
+  mysql_data:
