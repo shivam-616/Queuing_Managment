@@ -16,6 +16,11 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class AdminController {
 
+//    public AdminController(QueueEntryService queueEntryService, QueueWebSocketController queueWebSocketController) {
+//        this.queueEntryService = queueEntryService;
+//        this.queueWebSocketController = queueWebSocketController;
+//    }
+
     private final QueueEntryService queueEntryService;
     private final QueueWebSocketController queueWebSocketController;
 

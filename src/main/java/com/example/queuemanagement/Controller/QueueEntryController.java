@@ -14,6 +14,10 @@ import java.util.List;
 @RequestMapping("/api/queue/{queueId}")
 @RequiredArgsConstructor
 public class QueueEntryController {
+//    public QueueEntryController(QueueEntryService queueEntryService) {
+//        this.queueEntryService = queueEntryService;
+//    }
+
     private final QueueEntryService queueEntryService;
 
     @PostMapping("/create")

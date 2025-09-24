@@ -10,4 +10,12 @@ import java.util.Map;
 @AllArgsConstructor
 public class QueueEntryRequest {
     private Map<String, Object> details;
+
+    public Map<String, Object> getDetails() {
+        return details;
+    }
+
+    public void setDetails(Map<String, Object> details) {
+        this.details = details;
+    }
 }

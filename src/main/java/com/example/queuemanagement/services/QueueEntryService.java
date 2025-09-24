@@ -14,6 +14,11 @@ import java.util.Optional;
 @Service
 @RequiredArgsConstructor
 public class QueueEntryService {
+//    public QueueEntryService(QueueEntryRepository repository, QueueWebSocketController webSocketController) {
+//        this.repository = repository;
+//        this.webSocketController = webSocketController;
+//    }
+
     private final QueueEntryRepository repository;
     private final QueueWebSocketController webSocketController;
 
