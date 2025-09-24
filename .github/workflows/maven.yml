@@ -1,0 +1,58 @@
+# Name of the workflow
+name: Deploy to Google Cloud Run
+
+# This workflow runs on pushes to your 'master' branch
+on:
+  push:
+    branches: [ "master" ]
+
+jobs:
+  deploy:
+    # The type of runner that the job will run on
+    runs-on: ubuntu-latest
+
+    # Your specific project details are set here
+    env:
+      PROJECT_ID: 'queue-mangment-system'
+      REGION: 'us-central1'
+      SERVICE_NAME: 'queue-management-system'
+      REPO_NAME: 'queue-app-repo'
+
+    # Steps represent a sequence of tasks that will be executed as part of the job
+    steps:
+      # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      # Authenticate to Google Cloud using the Service Account key you created
+      - name: Google Auth
+        id: auth
+        uses: 'google-github-actions/auth@v2'
+        with:
+           credentials_json: '${{{  "type": "service_account",  "project_id": "queue-mangment-system",  "private_key_id": "41c7e95bf74e6c5c528a5732187ccc71c79827f2",  "private_key": "-----BEGIN PRIVATE KEY-----\nMIIEvQIBADANBgkqhkiG9w0BAQEFAASCBKcwggSjAgEAAoIBAQCwVj3R94WOhyxT\nlsoGwiVEdjIqFEJwHo/JTLgKrgfOTQA8ssd4Hig4MuOpe85HKHLWZefn9BENywuf\ngxs4TS5n8qnGafKhS/xMJvJxJlwwdUeg3LpIAUnI1qOxt+wWD372PQ6iD0suMOO3\n7yQoIIIZxKSjwg3w1IqUPek/HFTQ3yMckG8lMvszpPvURa5rXHuHyjSm7Jkjy/0S\nxWFdSK/rFb13IlFzi+A6bJIps8Wky5ImDP7QLPvNYWkEEm/Ur50OAWbCTzwJFq1n\nF4z2gDh96nkcCv+M1yXdufKSMy6i+kGfXrN/xVx3+tnwx303A73PgMFDUrRvnzR0\nuau1dRiXAgMBAAECggEACR5ckggHuwgYbbYlelX90V1/WJe1m9CoxNMXzU2Uj8GB\nmqHwGLEOiWFwTmpdj2ZzEc0xQdhoLVtrnXMNLEspdCyjRORjrJ2eTV3SObGvIL5f\n1tyzMVgHtcALtPv61GU2vosHv6+kxp22mONf7kdIEwcNMH6vc9250NKmxiGz7R0W\ny68TfDa3cIIVimz5t+OTcfARUSHOUc+Hnh4+cx12TiMu95fyumc7SuJ5VReuKKd6\ngGp4JlGoQV9fwPAgIp6OigXpqaAPDysVvVLvgPeMRwzQbcegoiw+12zYHDqQMwBv\nnkB/5lJDRx6oOTb7nROqx0k1aqvHkz6LX78/ndeHoQKBgQDl+eUJdxIbDdoSBtbk\nW06VbLmsc8iUPHebptAfvhHI0i+xD0owHAMGhLzSDGfszhu2WfWk27jtzfdMR4Je\neAtehqx8Rc3bTKNnXzlb4HhqpB/QyegaWCKBp+E67RlL0OQThT2IXmKKqoNDxxbg\nRLYwYTnqQGz1ItzmiB3wcyuMsQKBgQDESnztoKrVyCkugQY7rtBioUH9kk9YGbml\nNNNL8Y7fkts9EbycJBiMMsvCQyPeQIs17DKApYe6EnprReahIYSoPR5moYpQtG6s\nNBUfCirCjOLx2blC44LI8moWqrczTVFHqFwTuhzTXCoO4hBVVNwHbdMP00sZ8bnf\ndwX8l8krxwKBgBI+a8P/dSk+RRFvB3cgIzDJakVa/gt8bISljBcojeKfgfcK3njI\nkBjhSNVk9I2doCcsJceJQrdiwn6Dobz6yvQZvO8y3mzKPKBDtpoqSYM0N+3pRodo\nfHxKpBx3mK0iCiXeSQ5bZnfXpQgocBEkgkt+OwjxSXN864dCPxXHHSpRAoGBAJox\nDSu5LxlZ74eZUOUnMIiZtfXTrcI+CwfMlEKu0RWtDc1OFoPtEt9ms4q5JP7cYr6L\n+Sv3W8P96e5EbaObadKimDP0p2s4IUviackFOouzEj77Ub1KbJ0fV9jQZ7LEBJou\nlY3lf+lEF8GzMTNmwqSPT+G5j+Akc2cn3ysJrLxXAoGAaZ0OLRX4tCOTO1mRl35Z\nrt9A5eZZz5usgNCEzJ00Bb9SOkaaVj+NMEdwOeaM3tVbQNywMSj7ujOSBec/pqFH\nJTAP7mEHLPM/YWyCWeFsDlvXxJn5bwJZUrnhX257y0cdQV5NEdrb11HR8mMzd9Lt\nQjjVoaVFu0kb9mH7TTlB1Dw=\n-----END PRIVATE KEY-----\n",  "client_email": "github-actions-deployer@queue-mangment-system.iam.gserviceaccount.com",  "client_id": "103270161860580137117",  "auth_uri": "https://accounts.google.com/o/oauth2/auth",  "token_uri": "https://oauth2.googleapis.com/token",  "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",  "client_x509_cert_url": "https://www.googleapis.com/robot/v1/metadata/x509/github-actions-deployer%40queue-mangment-system.iam.gserviceaccount.com",  "universe_domain": "googleapis.com"}}}'
+
+      # Set up the GCloud SDK
+      - name: Set up Cloud SDK
+        uses: 'google-github-actions/setup-gcloud@v2'
+
+      # Configure Docker to use the gcloud command-line tool as a credential helper
+      - name: Configure Docker
+        run: gcloud auth configure-docker ${{ env.REGION }}-docker.pkg.dev
+
+      # Build the Docker image, tagging it with the unique commit SHA
+      - name: Build Docker image
+        run: docker build -t ${{ env.REGION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/${{ env.REPO_NAME }}/${{ env.SERVICE_NAME }}:${{ github.sha }} .
+
+      # Push the Docker image to Google Artifact Registry
+      - name: Push Docker image
+        run: docker push ${{ env.REGION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/${{ env.REPO_NAME }}/${{ env.SERVICE_NAME }}:${{ github.sha }}
+
+      # Deploy the image to Cloud Run, creating a new revision
+      - name: Deploy to Cloud Run
+        id: deploy
+        uses: 'google-github-actions/deploy-cloudrun@v2'
+        with:
+          service: ${{ env.SERVICE_NAME }}
+          region: ${{ env.REGION }}
+          # Deploy the specific image we just built and pushed
+          image: ${{ env.REGION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/${{ env.REPO_NAME }}/${{ env.SERVICE_NAME }}:${{ github.sha }}
