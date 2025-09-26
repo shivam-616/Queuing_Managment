@@ -143,7 +143,6 @@
 					<excludes>
 						<exclude>
 							<groupId>org.projectlombok</groupId>
-							<version>1.18.42</version>
 						</exclude>
 					</excludes>
 				</configuration>
