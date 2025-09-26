@@ -2,12 +2,10 @@ package com.example.queuemanagement.Controller;
 
 import com.example.queuemanagement.entites.QueueEntry;
 import com.example.queuemanagement.services.QueueEntryService;
+import lombok.NoArgsConstructor;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.Optional;
 
@@ -16,12 +14,8 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class AdminController {
 
-//    public AdminController(QueueEntryService queueEntryService, QueueWebSocketController queueWebSocketController) {
-//        this.queueEntryService = queueEntryService;
-//        this.queueWebSocketController = queueWebSocketController;
-//    }
 
-    private final QueueEntryService queueEntryService;
+    private final QueueEntryService     queueEntryService;
     private final QueueWebSocketController queueWebSocketController;
 
     @PostMapping("/next")
@@ -36,5 +30,11 @@ public class AdminController {
         } else {
             return ResponseEntity.status(404).body("No one is waiting in the queue.");
         }
+    }
+
+    @DeleteMapping("/clear")
+    public ResponseEntity<Void> clearQueue(@PathVariable String queueId) {
+        queueEntryService.clearQueue(queueId);
+        return ResponseEntity.ok().build();
     }
 }

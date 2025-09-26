@@ -3,85 +3,125 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Create a New Queue</title>
+    <title>Queue Management System - Smart, Safe, and Simple Queuing</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
         body { font-family: 'Inter', sans-serif; }
     </style>
 </head>
-<body class="bg-slate-100 flex items-center justify-center min-h-screen p-4">
+<body class="bg-slate-50 text-slate-700">
 
-<div class="w-full max-w-lg bg-white p-8 sm:p-12 rounded-2xl shadow-xl">
-
-    <div class="text-center mb-10">
-        <div class="mx-auto flex items-center justify-center h-12 w-12 rounded-full bg-indigo-100">
-            <svg class="h-6 w-6 text-indigo-600" xmlns="http://www.w.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4" />
-            </svg>
-        </div>
-        <h1 class="text-3xl font-bold mt-4 text-gray-900">Create a New Queue</h1>
-        <p class="mt-2 text-slate-600">Fill out the details below to get started.</p>
+<header class="bg-white shadow-sm">
+    <div class="container mx-auto px-6 py-4 flex justify-between items-center">
+        <h1 class="text-2xl font-bold text-indigo-600">Queue Management System</h1>
+        <a href="create.html" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2 px-4 rounded-lg transition-transform transform hover:scale-105">
+            Set up a Queue
+        </a>
     </div>
+</header>
 
-    <form id="createQueueForm">
-        <div class="space-y-6">
+<main class="container mx-auto px-6 py-16 text-center">
+    <h2 class="text-4xl md:text-5xl font-extrabold text-slate-900 leading-tight">
+        A Smarter, Safer Queuing System
+    </h2>
+    <p class="mt-4 max-w-2xl mx-auto text-lg text-slate-600">
+        Improve your visitors’ waiting experience with a free, real-time, and contactless queue management solution.
+    </p>
+    <div class="mt-8">
+        <a href="create.html" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-4 px-8 rounded-lg text-lg transition-transform transform hover:scale-105 shadow-lg">
+            Get Started for Free
+        </a>
+    </div>
+</main>
 
-            <div>
-                <label for="queueName" class="block text-sm font-medium text-slate-700">Queue Name</label>
-                <div class="mt-1 relative">
-                    <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                        <svg class="h-5 w-5 text-slate-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
-                            <path fill-rule="evenodd" d="M17.707 9.293a1 1 0 010 1.414l-7 7a1 1 0 01-1.414 0l-7-7a1 1 0 011.414-1.414L10 14.586l6.293-6.293a1 1 0 011.414 0z" clip-rule="evenodd" />
-                        </svg>
-                    </div>
-                    <input type="text" id="queueName" name="queueName" class="block w-full pl-10 pr-3 py-2 bg-slate-50 border border-slate-300 rounded-md text-slate-900 placeholder-slate-400 focus:outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500" required placeholder="e.g., Doctor's Appointment">
-                </div>
+<section class="bg-white py-20">
+    <div class="container mx-auto px-6 grid md:grid-cols-3 gap-12 text-center">
+        <div>
+            <div class="mx-auto flex items-center justify-center h-12 w-12 rounded-full bg-indigo-100 text-indigo-600">
+                <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
             </div>
-
-            <div>
-                <label for="userDetails" class="block text-sm font-medium text-slate-700">User Details to Collect</label>
-                <div class="mt-1 relative">
-                    <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                        <svg class="h-5 w-5 text-slate-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
-                            <path d="M9 2a1 1 0 000 2h2a1 1 0 100-2H9z" />
-                            <path fill-rule="evenodd" d="M4 5a2 2 0 012-2h8a2 2 0 012 2v10a2 2 0 01-2 2H6a2 2 0 01-2-2V5zm3 4a1 1 0 011-1h2a1 1 0 110 2H8a1 1 0 01-1-1zm-1 4a1 1 0 100 2h6a1 1 0 100-2H6z" clip-rule="evenodd" />
-                        </svg>
-                    </div>
-                    <input type="text" id="userDetails" name="userDetails" class="block w-full pl-10 pr-3 py-2 bg-slate-50 border border-slate-300 rounded-md text-slate-900 placeholder-slate-400 focus:outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500" placeholder="e.g., Name, Phone, Email" value="Name, Phone" required>
-                </div>
-                <p class="mt-2 text-xs text-slate-500">Comma-separated values for the info you need from people.</p>
+            <h3 class="mt-5 text-xl font-semibold text-slate-900">Wait from Anywhere</h3>
+            <p class="mt-2 text-slate-600">Visitors can follow their queue progress on their smartphones, freeing them from waiting in crowded lines.</p>
+        </div>
+        <div>
+            <div class="mx-auto flex items-center justify-center h-12 w-12 rounded-full bg-indigo-100 text-indigo-600">
+                <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
             </div>
+            <h3 class="mt-5 text-xl font-semibold text-slate-900">Promote Safety</h3>
+            <p class="mt-2 text-slate-600">Our system eliminates crowds and promotes social distancing, keeping your employees and visitors safe.</p>
+        </div>
+        <div>
+            <div class="mx-auto flex items-center justify-center h-12 w-12 rounded-full bg-indigo-100 text-indigo-600">
+                <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
+            </div>
+            <h3 class="mt-5 text-xl font-semibold text-slate-900">Setup in Minutes for Free</h3>
+            <p class="mt-2 text-slate-600">No hardware, no app installations, and no sign-up forms. Create your queue in minutes, completely free.</p>
+        </div>
+    </div>
+</section>
 
-            <div>
-                <button type="submit" class="w-full flex justify-center items-center gap-2 py-3 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-transform transform hover:scale-105">
-                    <span>Create Queue & Get Links</span>
-                    <svg class="h-5 w-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
-                        <path fill-rule="evenodd" d="M10.293 3.293a1 1 0 011.414 0l6 6a1 1 0 010 1.414l-6 6a1 1 0 01-1.414-1.414L14.586 11H3a1 1 0 110-2h11.586l-4.293-4.293a1 1 0 010-1.414z" clip-rule="evenodd" />
-                    </svg>
-                </button>
+<section class="py-20">
+    <div class="container mx-auto px-6">
+        <div class="text-center">
+            <h2 class="text-3xl font-bold text-slate-900">How It Works</h2>
+            <p class="mt-2 text-slate-600">A simple 3-step process for you and your visitors.</p>
+        </div>
+        <div class="mt-12 grid md:grid-cols-3 gap-10">
+            <div class="bg-white p-8 rounded-lg shadow-md">
+                <div class="font-bold text-indigo-600">Step 1</div>
+                <h3 class="mt-2 text-xl font-semibold text-slate-900">Scan to Join</h3>
+                <p class="mt-2 text-slate-600">A visitor scans the QR code at your entrance, fills out the required details, and instantly gets their place in the queue.</p>
+            </div>
+            <div class="bg-white p-8 rounded-lg shadow-md">
+                <div class="font-bold text-indigo-600">Step 2</div>
+                <h3 class="mt-2 text-xl font-semibold text-slate-900">Wait Remotely</h3>
+                <p class="mt-2 text-slate-600">The visitor can wait outside, in their car, or nearby, watching their position update in real-time on their phone.</p>
+            </div>
+            <div class="bg-white p-8 rounded-lg shadow-md">
+                <div class="font-bold text-indigo-600">Step 3</div>
+                <h3 class="mt-2 text-xl font-semibold text-slate-900">Get Notified</h3>
+                <p class="mt-2 text-slate-600">The admin calls the next person from a simple web interface, and the visitor receives a notification that it's their turn.</p>
             </div>
         </div>
-    </form>
-</div>
+    </div>
+</section>
 
-<script>
-    document.getElementById("createQueueForm").addEventListener("submit", function(e) {
-        e.preventDefault();
-        const queueName = document.getElementById("queueName").value;
-        const userDetails = document.getElementById("userDetails").value;
-        const queueId = queueName.replace(/\s+/g, '-').toLowerCase();
+<section class="bg-white py-20">
+    <div class="container mx-auto px-6 max-w-3xl">
+        <div class="text-center">
+            <h2 class="text-3xl font-bold text-slate-900">Common Questions</h2>
+        </div>
+        <div class="mt-10 space-y-6">
+            <div>
+                <h4 class="font-semibold text-lg text-slate-900">Is it completely free?</h4>
+                <p class="mt-1 text-slate-600">Yes. This service is entirely free to use.</p>
+            </div>
+            <div>
+                <h4 class="font-semibold text-lg text-slate-900">Can I display the queue status on a TV or monitor?</h4>
+                <p class="mt-1 text-slate-600">Yes. The admin dashboard is a web page that can be displayed on any device with a web browser, like a Smart TV or a computer connected to a display.</p>
+            </div>
+            <div>
+                <h4 class="font-semibold text-lg text-slate-900">Who can use this system?</h4>
+                <p class="mt-1 text-slate-600">It's perfect for clinics, museums, car washes, restaurants, government offices, and anyone who wants to manage a line of visitors. It takes just minutes to set up, so we encourage you to just try it!</p>
+            </div>
+        </div>
+    </div>
+</section>
 
-        const params = new URLSearchParams();
-        params.append('id', queueId);
-        params.append('name', queueName);
-        params.append('details', userDetails);
+<section class="py-20">
+    <div class="container mx-auto px-6 text-center">
+        <h2 class="text-3xl font-bold text-slate-900">Ready to Get Started?</h2>
+        <p class="mt-2 text-slate-600">Create your first queue in just a few clicks.</p>
+        <div class="mt-8">
+            <a href="create.html" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-4 px-8 rounded-lg text-lg transition-transform transform hover:scale-105 shadow-lg">
+                Set up Your Queue Now
+            </a>
+        </div>
+    </div>
+</section>
 
-        const destinationUrl = `queue-links.html?${params.toString()}`;
-        window.location.href = destinationUrl;
-    });
-</script>
 </body>
 </html>

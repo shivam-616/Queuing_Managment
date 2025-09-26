@@ -65,10 +65,11 @@
 			<version>1.13.1</version>
 		</dependency>
 		<!-- https://mvnrepository.com/artifact/org.projectlombok/lombok -->
+		<!-- https://mvnrepository.com/artifact/org.projectlombok/lombok -->
 		<dependency>
 			<groupId>org.projectlombok</groupId>
 			<artifactId>lombok</artifactId>
-			<version>1.18.38</version>
+			<version>1.18.42</version>
 		</dependency>
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
@@ -129,7 +130,7 @@
 						<path>
 							<groupId>org.projectlombok</groupId>
 							<artifactId>lombok</artifactId>
-<!--							<version>1.18.38</version>-->
+						   <version>1.18.42</version>
 
 						</path>
 					</annotationProcessorPaths>
@@ -142,8 +143,7 @@
 					<excludes>
 						<exclude>
 							<groupId>org.projectlombok</groupId>
-
-
+							<version>1.18.42</version>
 						</exclude>
 					</excludes>
 				</configuration>

@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Create a New Queue</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Inter', sans-serif; }
+    </style>
+</head>
+<body class="bg-slate-100 flex items-center justify-center min-h-screen p-4">
+
+<div class="w-full max-w-lg bg-white p-8 sm:p-12 rounded-2xl shadow-xl">
+    <div class="text-center mb-10">
+        <div class="mx-auto flex items-center justify-center h-12 w-12 rounded-full bg-indigo-100">
+            <svg class="h-6 w-6 text-indigo-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4" />
+            </svg>
+        </div>
+        <h1 class="text-3xl font-bold mt-4 text-gray-900">Create a New Queue</h1>
+        <p class="mt-2 text-slate-600">Fill out the details below to get started.</p>
+    </div>
+
+    <form id="createQueueForm">
+        <div class="space-y-6">
+            <div>
+                <label for="queueName" class="block text-sm font-medium text-slate-700">Queue Name</label>
+                <div class="mt-1 relative">
+                    <input type="text" id="queueName" name="queueName" class="block w-full pl-3 pr-3 py-2 bg-slate-50 border border-slate-300 rounded-md text-slate-900 placeholder-slate-400 focus:outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500" required placeholder="e.g., Doctor's Appointment">
+                </div>
+            </div>
+            <div>
+                <label for="userDetails" class="block text-sm font-medium text-slate-700">User Details to Collect</label>
+                <div class="mt-1 relative">
+                    <input type="text" id="userDetails" name="userDetails" class="block w-full pl-3 pr-3 py-2 bg-slate-50 border border-slate-300 rounded-md text-slate-900 placeholder-slate-400 focus:outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500" placeholder="e.g., Name, Phone, Email" value="Name, Phone" required>
+                </div>
+                <p class="mt-2 text-xs text-slate-500">Comma-separated values for the info you need from people.</p>
+            </div>
+            <div>
+                <button type="submit" class="w-full flex justify-center items-center gap-2 py-3 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-transform transform hover:scale-105">
+                    <span>Create Queue & Get Links</span>
+                    <svg class="h-5 w-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                        <path fill-rule="evenodd" d="M10.293 3.293a1 1 0 011.414 0l6 6a1 1 0 010 1.414l-6 6a1 1 0 01-1.414-1.414L14.586 11H3a1 1 0 110-2h11.586l-4.293-4.293a1 1 0 010-1.414z" clip-rule="evenodd" />
+                    </svg>
+                </button>
+            </div>
+        </div>
+    </form>
+</div>
+
+<div id="existingQueueModal" class="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full hidden z-50">
+    <div class="relative top-20 mx-auto p-5 border w-96 shadow-lg rounded-md bg-white">
+        <div class="mt-3 text-center">
+            <div class="mx-auto flex items-center justify-center h-12 w-12 rounded-full bg-yellow-100">
+                <svg class="h-6 w-6 text-yellow-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg>
+            </div>
+            <h3 class="text-lg leading-6 font-medium text-gray-900 mt-2">Queue Already Exists!</h3>
+            <div class="mt-2 px-7 py-3">
+                <p class="text-sm text-gray-500">A queue with this name already has data. What would you like to do?</p>
+            </div>
+            <div class="items-center px-4 py-3 space-y-3">
+                <button id="resetQueueBtn" class="px-4 py-2 bg-red-500 text-white text-base font-medium rounded-md w-full shadow-sm hover:bg-red-600 focus:outline-none focus:ring-2 focus:ring-red-300">
+                    Reset Queue (Delete All Data)
+                </button>
+                <button id="goToAdminBtn" class="px-4 py-2 bg-blue-500 text-white text-base font-medium rounded-md w-full shadow-sm hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-300">
+                    Go to Admin Dashboard
+                </button>
+                <button id="cancelBtn" class="px-4 py-2 bg-gray-200 text-gray-800 text-base font-medium rounded-md w-full shadow-sm hover:bg-gray-300 focus:outline-none focus:ring-2 focus:ring-gray-300">
+                    Cancel
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    document.getElementById("createQueueForm").addEventListener("submit", function(e) {
+        e.preventDefault();
+        const queueName = document.getElementById("queueName").value;
+        const userDetails = document.getElementById("userDetails").value;
+        const queueId = queueName.replace(/\s+/g, '-').toLowerCase();
+
+        // Check if the queue exists and has data before proceeding
+        fetch(`/api/queue/${queueId}/exists`)
+            .then(res => {
+                if (!res.ok) {
+                    // Handle cases where the endpoint itself might fail (e.g., 404 Not Found)
+                    throw new Error('Could not check queue status. Please ensure the backend is running correctly.');
+                }
+                return res.json();
+            })
+            .then(exists => {
+                if (exists) {
+                    // If it exists, show the modal with options
+                    showExistingQueueModal(queueId, queueName, userDetails);
+                } else {
+                    // Otherwise, create it normally
+                    proceedToCreateQueue(queueId, queueName, userDetails);
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('An error occurred. Check the console for details.');
+            });
+    });
+
+    function showExistingQueueModal(queueId, queueName, userDetails) {
+        const modal = document.getElementById('existingQueueModal');
+        modal.classList.remove('hidden');
+
+        document.getElementById('resetQueueBtn').onclick = () => {
+            // Call the new DELETE endpoint
+            fetch(`/api/admin/${queueId}/clear`, { method: 'DELETE' })
+                .then(res => {
+                    if (res.ok) {
+                        modal.classList.add('hidden');
+                        proceedToCreateQueue(queueId, queueName, userDetails);
+                    } else {
+                        alert('Failed to reset the queue.');
+                    }
+                });
+        };
+
+        document.getElementById('goToAdminBtn').onclick = () => {
+            // Redirect to the admin page for that queue
+            window.location.href = `admin.html?id=${encodeURIComponent(queueId)}&name=${encodeURIComponent(queueName)}`;
+        };
+
+        document.getElementById('cancelBtn').onclick = () => {
+            // Just hide the modal
+            modal.classList.add('hidden');
+        };
+    }
+
+    function proceedToCreateQueue(queueId, queueName, userDetails) {
+        const params = new URLSearchParams();
+        params.append('id', queueId);
+        params.append('name', queueName);
+        params.append('details', userDetails);
+        window.location.href = `queue-links.html?${params.toString()}`;
+    }
+</script>
+
+</body>
+</html>

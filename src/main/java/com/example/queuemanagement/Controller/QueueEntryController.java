@@ -30,6 +30,13 @@ public class QueueEntryController {
     public ResponseEntity<List<QueueEntry>> getAllEntries(@PathVariable String queueId) {
         return ResponseEntity.ok(queueEntryService.getAllEntriesByQueueId(queueId));
     }
+
+    // Add this new method
+    @GetMapping("/exists")
+    public ResponseEntity<Boolean> queueExists(@PathVariable String queueId) {
+        boolean hasEntries = !queueEntryService.getAllEntriesByQueueId(queueId).isEmpty();
+        return ResponseEntity.ok(hasEntries);
+    }
 }
 
 
