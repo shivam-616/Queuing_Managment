@@ -34,8 +34,9 @@ public class QueueEntry {
     private boolean notified;
 
     @CreationTimestamp
-    @Column(nullable = false, updatable = false)
+    @Column(name = "created_at", nullable = false, updatable = false)
     private LocalDateTime createdAt;
 
+    @Column(name = "called_at")
     private LocalDateTime calledAt;
 }
