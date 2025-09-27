@@ -41,7 +41,7 @@ Below are some screenshots of the Queue Management System in action:
 
 ##🏠 Landing Page
 
-<img width="1894" height="968" alt="Screenshot 2025-09-28 014619" src="https://github.com/user-attachments/assets/2379fac0-df14-4818-adbb-11930e0348f8" />
+![Screenshot 2025-09-28 014619](https://github.com/user-attachments/assets/3ecda21f-ac6b-48ca-8873-09fbdba6dc98)
 
 ##➕ Create a New Queue
 
