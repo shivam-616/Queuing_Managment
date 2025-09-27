@@ -9,7 +9,7 @@ A full-stack, real-time queue management system built with Java Spring Boot, Web
 
 ## ✨ Live Demo & Features
 
-**Live Application URL:** `https://[YOUR_CLOUD_RUN_URL_HERE]` *(Replace with your actual Cloud Run URL)*
+**Live Application URL:** `[https://[YOUR_CLOUD_RUN_URL_HERE]](https://queue-management-system-1070272816562.us-central1.run.app)' 
 
 ---
 
@@ -34,6 +34,21 @@ This project leverages a modern, robust technology stack for a full-featured web
 | **Frontend** | HTML5, Tailwind CSS, Vanilla JavaScript                                 |
 | **API Docs** | Springdoc OpenAPI (Swagger UI)                                          |
 | **Deployment** | Docker, Google Cloud Run, GitHub Actions (CI/CD)                        |
+
+### 📸 Screenshots
+
+Below are some screenshots of the Queue Management System in action:
+
+##🏠 Landing Page
+
+<img width="1894" height="968" alt="Screenshot 2025-09-28 014619" src="https://github.com/user-attachments/assets/2379fac0-df14-4818-adbb-11930e0348f8" />
+
+##➕ Create a New Queue
+
+<img width="963" height="964" alt="Screenshot 2025-09-28 014711" src="https://github.com/user-attachments/assets/d5ef6d1d-11a0-4984-b28c-dea4289ccfd2" />
+
+##✅ Queue Created Successfully
+<img width="862" height="699" alt="Screenshot 2025-09-28 014754" src="https://github.com/user-attachments/assets/8baeaff0-3af1-4e50-a15e-46a16c79c388" />
 
 ## 🚀 Getting Started
 
