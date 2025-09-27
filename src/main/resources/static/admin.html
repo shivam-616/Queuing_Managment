@@ -23,15 +23,23 @@
             <p class="text-slate-600 mt-1">Admin Panel for: <strong id="queueName" class="font-semibold text-indigo-600"></strong></p>
             <p id="adminWaitTime" class="text-sm text-indigo-600 font-semibold mt-1"></p>
         </div>
-        <button id="callNext" class="w-full sm:w-auto flex items-center justify-center gap-2 bg-green-600 hover:bg-green-700 text-white font-bold py-3 px-6 rounded-lg focus:outline-none focus:ring-4 focus:ring-green-300 transition-transform transform hover:scale-105">
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M11 15l-3-3m0 0l3-3m-3 3h8M3 12a9 9 0 1118 0 9 9 0 01-18 0z" />
-            </svg>
-            <span>Call Next Person</span>
-        </button>
+        <!-- Container for multiple buttons -->
+        <div class="flex flex-col sm:flex-row gap-3 w-full sm:w-auto">
+            <!-- Link to the Business Dashboard -->
+            <a id="dashboardLink" href="#" target="_blank" rel="noopener noreferrer" class="w-full sm:w-auto flex items-center justify-center gap-2 bg-gray-700 hover:bg-gray-800 text-white font-bold py-3 px-6 rounded-lg transition-transform transform hover:scale-105">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" /></svg>
+                <span>Dashboard</span>
+            </a>
+            <button id="callNext" class="w-full sm:w-auto flex items-center justify-center gap-2 bg-green-600 hover:bg-green-700 text-white font-bold py-3 px-6 rounded-lg focus:outline-none focus:ring-4 focus:ring-green-300 transition-transform transform hover:scale-105">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M11 15l-3-3m0 0l3-3m-3 3h8M3 12a9 9 0 1118 0 9 9 0 01-18 0z" /></svg>
+                <span>Call Next Person</span>
+            </button>
+        </div>
     </header>
 
     <div id="notification" class="mb-6 p-4 rounded-md text-center font-semibold hidden"></div>
+
+    <!-- Analytics Section has been removed -->
 
     <main class="grid grid-cols-1 lg:grid-cols-2 gap-8">
         <div>
@@ -71,13 +79,14 @@
     const queueId = params.get('id');
     const queueName = params.get('name');
     let stompClient = null;
-
     let previousWaitingCount = 0;
     const notificationSound = new Audio('notification.mp3');
 
     document.getElementById('queueName').textContent = queueName || 'Unnamed Queue';
+    // Dynamically set the href for the new dashboard button
+    document.getElementById('dashboardLink').href = `dashboard.html?id=${encodeURIComponent(queueId)}&name=${encodeURIComponent(queueName)}`;
 
-    function renderQueue(queue, estimatedWaitTime) { // <-- EDITED: Now accepts wait time
+    function renderQueue(queue, estimatedWaitTime) {
         const waitingList = document.getElementById("waiting-list");
         const calledList = document.getElementById("called-list");
         waitingList.innerHTML = "";
@@ -108,19 +117,16 @@
             }
         });
 
-        // Sound notification logic
         if (waitingCount > 0 && waitingCount > previousWaitingCount) {
             notificationSound.play();
         }
         previousWaitingCount = waitingCount;
 
-        // Update counters and empty states
         document.getElementById('waitingCount').textContent = waitingCount;
         document.getElementById('calledCount').textContent = calledCount;
         document.getElementById('waiting-empty-state').style.display = waitingCount === 0 ? 'block' : 'none';
         document.getElementById('called-empty-state').style.display = calledCount === 0 ? 'block' : 'none';
 
-        // NEW: Display the estimated wait time for the admin
         const waitTimeDiv = document.getElementById("adminWaitTime");
         if (estimatedWaitTime >= 0) {
             waitTimeDiv.innerText = `~${estimatedWaitTime} min estimated wait`;
@@ -129,28 +135,29 @@
         }
     }
 
+    // Analytics functions have been removed.
+
     function connectSocket() {
         const socket = new SockJS("/ws");
         stompClient = Stomp.over(socket);
         stompClient.connect({}, function (frame) {
             console.log("Connected to WebSocket");
             stompClient.subscribe(`/topic/queue/${queueId}`, function (message) {
-                // EDITED: Parse the full QueueUpdate object from the backend
+                // The backend may still send analytics, but we will just ignore it.
                 const queueUpdate = JSON.parse(message.body);
                 renderQueue(queueUpdate.entries, queueUpdate.estimatedWaitTime);
             });
+            // Fetch initial state on connect
             fetchInitialQueueState();
         });
     }
 
     function fetchInitialQueueState() {
-        // The /all endpoint only returns the list of entries, not the wait time yet.
-        // We will fetch it and pass a default wait time. The WebSocket will provide real-time updates.
         fetch(`/api/queue/${queueId}/all`)
             .then(res => res.json())
             .then(queue => {
                 previousWaitingCount = (queue || []).filter(u => u.status === 'waiting').length;
-                renderQueue(queue, -1); // Pass -1 to show a default message initially
+                renderQueue(queue, -1);
             });
     }
 
@@ -180,3 +187,4 @@
 </script>
 </body>
 </html>
+

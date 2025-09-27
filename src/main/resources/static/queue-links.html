@@ -57,6 +57,21 @@
             </div>
         </div>
 
+        <!-- NEWLY ADDED DASHBOARD LINK CARD -->
+        <div class="border border-gray-200 rounded-lg p-5">
+            <div class="flex items-start sm:items-center space-x-4">
+                <div class="flex-shrink-0 h-10 w-10 bg-green-100 text-green-600 rounded-lg flex items-center justify-center">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" /></svg>
+                </div>
+                <div><h3 class="font-semibold text-gray-800">Business Dashboard Link</h3><p class="text-sm text-gray-500">View analytics and visitor trends.</p></div>
+            </div>
+            <div class="mt-4 flex items-center bg-slate-100 p-2 rounded-md">
+                <a id="dashboardLink" href="#" target="_blank" rel="noopener noreferrer" class="text-sm text-green-700 truncate block flex-grow hover:underline"></a>
+                <button onclick="copyToClipboard('dashboardLink')" class="ml-3 flex-shrink-0 bg-green-500 hover:bg-green-600 text-white font-medium py-1 px-3 rounded-md text-sm">Copy</button>
+            </div>
+        </div>
+
+
         <div class="border border-gray-200 rounded-lg p-5 text-center">
             <h3 class="font-semibold text-gray-800">Visitor QR Code</h3>
             <p class="text-sm text-gray-500 mb-4">Display this for easy scanning and queue entry.</p>
@@ -78,18 +93,24 @@
         if (queueId) {
             const userLinkHref = `register.html?id=${encodeURIComponent(queueId)}&name=${encodeURIComponent(queueName)}&details=${encodeURIComponent(userDetails)}`;
             const adminLinkHref = `admin.html?id=${encodeURIComponent(queueId)}&name=${encodeURIComponent(queueName)}`;
+            // Create the new dashboard link
+            const dashboardLinkHref = `dashboard.html?id=${encodeURIComponent(queueId)}&name=${encodeURIComponent(queueName)}`;
 
             const fullUserUrl = new URL(userLinkHref, window.location.href).href;
-            const fullAdminUrl = new URL(adminLinkHref, window.location.href).href;
-
-            // FIX: Now we get the <a> elements and set BOTH href and textContent
             const userLinkElement = document.getElementById("userLink");
             userLinkElement.href = userLinkHref;
             userLinkElement.textContent = fullUserUrl;
 
+            const fullAdminUrl = new URL(adminLinkHref, window.location.href).href;
             const adminLinkElement = document.getElementById("adminLink");
             adminLinkElement.href = adminLinkHref;
             adminLinkElement.textContent = fullAdminUrl;
+
+            // Set the href and text for the new dashboard link
+            const fullDashboardUrl = new URL(dashboardLinkHref, window.location.href).href;
+            const dashboardLinkElement = document.getElementById("dashboardLink");
+            dashboardLinkElement.href = dashboardLinkHref;
+            dashboardLinkElement.textContent = fullDashboardUrl;
 
             const qrLinkHref = `/api/qr/generate?url=${encodeURIComponent(fullUserUrl)}`;
             document.getElementById("qrImage").src = qrLinkHref;
@@ -101,7 +122,6 @@
     };
 
     function copyToClipboard(elementId) {
-        // We get the href attribute from the link now, as it's the cleaner URL
         const textToCopy = document.getElementById(elementId).href;
         const button = document.querySelector(`button[onclick="copyToClipboard('${elementId}')"]`);
 
@@ -116,3 +136,4 @@
 
 </body>
 </html>
+

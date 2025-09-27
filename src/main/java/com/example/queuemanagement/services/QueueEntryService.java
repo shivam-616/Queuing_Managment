@@ -1,17 +1,23 @@
 package com.example.queuemanagement.services;
 
 import com.example.queuemanagement.Controller.QueueWebSocketController;
+import com.example.queuemanagement.DTO.AnalyticsDTO;
+import com.example.queuemanagement.DTO.DashboardAnalyticsDTO;
 import com.example.queuemanagement.Repository.QueueEntryRepository;
 import com.example.queuemanagement.entites.QueueEntry;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 
+import java.time.Duration;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -103,6 +109,73 @@ public class QueueEntryService {
     public void clearQueue(String queueId) {
         repository.deleteAllByQueueId(queueId);
         webSocketController.broadcastQueueUpdate(queueId); // Notify clients
+    }
+
+    public AnalyticsDTO getAnalytics(String queueId) {
+        List<QueueEntry> allEntries = repository.findAllByQueueId(queueId);
+        List<QueueEntry> servedEntries = allEntries.stream()
+                .filter(e -> "called".equalsIgnoreCase(e.getStatus()) && e.getCalledAt() != null && e.getCreatedAt() != null)
+                .sorted(Comparator.comparing(QueueEntry::getCalledAt))
+                .collect(Collectors.toList());
+
+        long avgWaitTime = (long) servedEntries.stream()
+                .mapToLong(e -> Duration.between(e.getCreatedAt(), e.getCalledAt()).toMinutes())
+                .average().orElse(-1);
+
+        long avgServiceTime = -1;
+        if (servedEntries.size() > 1) {
+            long totalServiceDuration = 0;
+            for (int i = 0; i < servedEntries.size() - 1; i++) {
+                totalServiceDuration += Duration.between(servedEntries.get(i).getCalledAt(), servedEntries.get(i + 1).getCalledAt()).toMinutes();
+            }
+            avgServiceTime = totalServiceDuration / (servedEntries.size() - 1);
+        }
+
+        long totalServedToday = allEntries.stream()
+                .filter(e -> "called".equalsIgnoreCase(e.getStatus()) && e.getCreatedAt().toLocalDate().isEqual(LocalDate.now()))
+                .count();
+
+        Map<Integer, Long> trafficByHour = allEntries.stream()
+                .filter(e -> e.getCreatedAt().toLocalDate().isEqual(LocalDate.now()))
+                .collect(Collectors.groupingBy(e -> e.getCreatedAt().getHour(), Collectors.counting()));
+
+        return new AnalyticsDTO(avgWaitTime, avgServiceTime, totalServedToday, trafficByHour);
+    }
+
+    // NEW METHOD FOR THE BUSINESS DASHBOARD
+    public DashboardAnalyticsDTO getDashboardAnalytics(String queueId) {
+        List<QueueEntry> todayEntries = repository.findAllByQueueId(queueId).stream()
+                .filter(e -> e.getCreatedAt().toLocalDate().isEqual(LocalDate.now()))
+                .collect(Collectors.toList());
+
+        // Reuse existing analytics logic
+        AnalyticsDTO basicAnalytics = getAnalytics(queueId);
+
+        // Calculate peak hour
+        String peakHour = "N/A";
+        if (!basicAnalytics.getTrafficByHour().isEmpty()) {
+            Optional<Map.Entry<Integer, Long>> peakEntry = basicAnalytics.getTrafficByHour().entrySet().stream()
+                    .max(Map.Entry.comparingByValue());
+            if (peakEntry.isPresent()) {
+                int hour = peakEntry.get().getKey();
+                peakHour = LocalDateTime.now().withHour(hour).format(DateTimeFormatter.ofPattern("h a")); // e.g., "2 PM"
+            }
+        }
+
+        // Get last 5 recent visitors
+        List<QueueEntry> recentVisitors = todayEntries.stream()
+                .sorted(Comparator.comparing(QueueEntry::getCreatedAt).reversed())
+                .limit(5)
+                .collect(Collectors.toList());
+
+        return new DashboardAnalyticsDTO(
+                todayEntries.size(),
+                peakHour,
+                basicAnalytics.getAverageWaitTimeMinutes(),
+                basicAnalytics.getAverageServiceTimeMinutes(),
+                basicAnalytics.getTrafficByHour(),
+                recentVisitors
+        );
     }
 
 }
