@@ -45,10 +45,11 @@ Below are some screenshots of the Queue Management System in action:
 
 ##➕ Create a New Queue
 
-<img width="963" height="964" alt="Screenshot 2025-09-28 014711" src="https://github.com/user-attachments/assets/d5ef6d1d-11a0-4984-b28c-dea4289ccfd2" />
+![Screenshot 2025-09-28 014711](https://github.com/user-attachments/assets/7eacd692-fb85-4a39-a138-425ee59e15da)
 
 ##✅ Queue Created Successfully
-<img width="862" height="699" alt="Screenshot 2025-09-28 014754" src="https://github.com/user-attachments/assets/8baeaff0-3af1-4e50-a15e-46a16c79c388" />
+
+![Screenshot 2025-09-28 014754](https://github.com/user-attachments/assets/21779d47-1446-4719-914e-1e22a5decfa5)
 
 ## 🚀 Getting Started
 
