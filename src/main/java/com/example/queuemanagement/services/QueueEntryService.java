@@ -51,14 +51,14 @@ public class QueueEntryService {
 
         entry.setStatus(status);
 
-        // Set calledAt timestamp when status becomes "called"
+        // When a user is called, set the timestamp
         if ("called".equalsIgnoreCase(status)) {
             entry.setCalledAt(LocalDateTime.now());
         }
 
         QueueEntry savedEntry = repository.save(entry);
 
-        // Keep live admin page updated
+        // Live admin update
         webSocketController.broadcastQueueUpdate(savedEntry.getQueueId());
         return savedEntry;
     }
@@ -74,6 +74,7 @@ public class QueueEntryService {
         List<QueueEntry> waitingEntries = repository.findByQueueIdAndStatus(queueId, "waiting");
         boolean isDuplicate = waitingEntries.stream()
                 .anyMatch(entry -> entry.getDetails().equals(details));
+
         if (isDuplicate) {
             throw new IllegalStateException("You are already in this queue.");
         }
@@ -85,7 +86,7 @@ public class QueueEntryService {
         entry.setQueueNumber(calculateNextQueueNumber(queueId));
         QueueEntry savedEntry = repository.save(entry);
 
-        // Keep live admin page updated
+        // Live admin update
         webSocketController.broadcastQueueUpdate(queueId);
 
         return savedEntry;
@@ -108,10 +109,11 @@ public class QueueEntryService {
     }
 
     /**
-     * Basic analytics across all records for this queue.
+     * General analytics across all entries in this queue.
      */
     public AnalyticsDTO getAnalytics(String queueId) {
         List<QueueEntry> allEntries = repository.findAllByQueueId(queueId);
+
         List<QueueEntry> servedEntries = allEntries.stream()
                 .filter(e -> "called".equalsIgnoreCase(e.getStatus()) && e.getCalledAt() != null && e.getCreatedAt() != null)
                 .sorted(Comparator.comparing(QueueEntry::getCalledAt))
@@ -125,40 +127,47 @@ public class QueueEntryService {
         if (servedEntries.size() > 1) {
             long totalServiceDuration = 0;
             for (int i = 0; i < servedEntries.size() - 1; i++) {
-                totalServiceDuration += Duration.between(servedEntries.get(i).getCalledAt(), servedEntries.get(i + 1).getCalledAt()).toMinutes();
+                totalServiceDuration += Duration.between(
+                        servedEntries.get(i).getCalledAt(),
+                        servedEntries.get(i + 1).getCalledAt()
+                ).toMinutes();
             }
             avgServiceTime = totalServiceDuration / (servedEntries.size() - 1);
         }
 
         long totalServedToday = allEntries.stream()
-                .filter(e -> "called".equalsIgnoreCase(e.getStatus()) && e.getCreatedAt() != null && e.getCreatedAt().toLocalDate().isEqual(LocalDate.now()))
+                .filter(e -> "called".equalsIgnoreCase(e.getStatus())
+                        && e.getCreatedAt() != null
+                        && e.getCreatedAt().toLocalDate().isEqual(LocalDate.now()))
                 .count();
 
         Map<Integer, Long> trafficByHour = allEntries.stream()
-                .filter(e -> e.getCreatedAt() != null && e.getCreatedAt().toLocalDate().isEqual(LocalDate.now()))
+                .filter(e -> e.getCreatedAt() != null
+                        && e.getCreatedAt().toLocalDate().isEqual(LocalDate.now()))
                 .collect(Collectors.groupingBy(e -> e.getCreatedAt().getHour(), Collectors.counting()));
 
         return new AnalyticsDTO(avgWaitTime, avgServiceTime, totalServedToday, trafficByHour);
     }
 
     /**
-     * Dashboard analytics intended for the business/admin dashboard.
-     * This computes analytics for today's entries and returns a DashboardAnalyticsDTO.
-     * This method does not depend on any undefined variable and will not break the live-update flow.
+     * Dashboard analytics for today's data.
+     * Peak hour is based on calledAt (when visitors were served).
      */
     public DashboardAnalyticsDTO getDashboardAnalytics(String queueId) {
-        // Get today's entries for this queue
+        // Get today's entries
         List<QueueEntry> todayEntries = repository.findAllByQueueId(queueId).stream()
-                .filter(e -> e.getCreatedAt() != null && e.getCreatedAt().toLocalDate().isEqual(LocalDate.now()))
+                .filter(e -> e.getCreatedAt() != null
+                        && e.getCreatedAt().toLocalDate().isEqual(LocalDate.now()))
                 .collect(Collectors.toList());
 
-        // Traffic by hour (today)
+        // Traffic by hour (today, based on calledAt)
         Map<Integer, Long> trafficByHour = todayEntries.stream()
-                .collect(Collectors.groupingBy(e -> e.getCreatedAt().getHour(), Collectors.counting()));
+                .filter(e -> e.getCalledAt() != null)
+                .collect(Collectors.groupingBy(e -> e.getCalledAt().getHour(), Collectors.counting()));
 
-        // Determine peak hour (safely handle empty map)
+        // Determine peak hour
         String peakHour = "N/A";
-        if (trafficByHour != null && !trafficByHour.isEmpty()) {
+        if (!trafficByHour.isEmpty()) {
             Optional<Map.Entry<Integer, Long>> peakEntry = trafficByHour.entrySet().stream()
                     .max(Map.Entry.comparingByValue());
             if (peakEntry.isPresent()) {
@@ -170,9 +179,11 @@ public class QueueEntryService {
             }
         }
 
-        // Compute avg wait time (minutes) for today's served entries
+        // Compute avg wait time for today's served entries
         List<QueueEntry> servedToday = todayEntries.stream()
-                .filter(e -> "called".equalsIgnoreCase(e.getStatus()) && e.getCalledAt() != null && e.getCreatedAt() != null)
+                .filter(e -> "called".equalsIgnoreCase(e.getStatus())
+                        && e.getCalledAt() != null
+                        && e.getCreatedAt() != null)
                 .sorted(Comparator.comparing(QueueEntry::getCalledAt))
                 .collect(Collectors.toList());
 
@@ -180,17 +191,20 @@ public class QueueEntryService {
                 .mapToLong(e -> Duration.between(e.getCreatedAt(), e.getCalledAt()).toMinutes())
                 .average().orElse(-1);
 
-        // Compute avg service time (minutes) based on calledAt gaps for today's served entries
+        // Compute avg service time (based on gaps between calls)
         long avgServiceTime = -1;
         if (servedToday.size() > 1) {
             long totalServiceDuration = 0;
             for (int i = 0; i < servedToday.size() - 1; i++) {
-                totalServiceDuration += Duration.between(servedToday.get(i).getCalledAt(), servedToday.get(i + 1).getCalledAt()).toMinutes();
+                totalServiceDuration += Duration.between(
+                        servedToday.get(i).getCalledAt(),
+                        servedToday.get(i + 1).getCalledAt()
+                ).toMinutes();
             }
             avgServiceTime = totalServiceDuration / (servedToday.size() - 1);
         }
 
-        // Last 5 recent visitors (today)
+        // Last 5 recent visitors today
         List<QueueEntry> recentVisitors = todayEntries.stream()
                 .sorted(Comparator.comparing(QueueEntry::getCreatedAt).reversed())
                 .limit(5)
