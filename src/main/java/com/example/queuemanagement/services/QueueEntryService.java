@@ -12,7 +12,6 @@ import org.springframework.stereotype.Service;
 import java.time.Duration;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
@@ -22,7 +21,6 @@ import java.util.stream.Collectors;
 @Service
 @RequiredArgsConstructor
 public class QueueEntryService {
-
 
     private final QueueEntryRepository repository;
     private final @Lazy QueueWebSocketController webSocketController;
@@ -53,12 +51,14 @@ public class QueueEntryService {
 
         entry.setStatus(status);
 
-        // --- NEW: Set the 'calledAt' timestamp when a user is called ---
+        // Set calledAt timestamp when status becomes "called"
         if ("called".equalsIgnoreCase(status)) {
             entry.setCalledAt(LocalDateTime.now());
         }
 
         QueueEntry savedEntry = repository.save(entry);
+
+        // Keep live admin page updated
         webSocketController.broadcastQueueUpdate(savedEntry.getQueueId());
         return savedEntry;
     }
@@ -70,19 +70,14 @@ public class QueueEntryService {
     }
 
     public QueueEntry createNewEntry(String queueId, Map<String, Object> details) {
-        // Step 1: Get all users who are currently 'waiting' in this queue
+        // Prevent duplicate waiting entries with same details
         List<QueueEntry> waitingEntries = repository.findByQueueIdAndStatus(queueId, "waiting");
-
-        // Step 2: Check if any of them have the same details
         boolean isDuplicate = waitingEntries.stream()
                 .anyMatch(entry -> entry.getDetails().equals(details));
-
-        // Step 3: If a duplicate is found, throw an error
         if (isDuplicate) {
             throw new IllegalStateException("You are already in this queue.");
         }
 
-        // If no duplicate is found, create the new entry as before
         QueueEntry entry = new QueueEntry();
         entry.setQueueId(queueId);
         entry.setDetails(details);
@@ -90,11 +85,11 @@ public class QueueEntryService {
         entry.setQueueNumber(calculateNextQueueNumber(queueId));
         QueueEntry savedEntry = repository.save(entry);
 
+        // Keep live admin page updated
         webSocketController.broadcastQueueUpdate(queueId);
 
         return savedEntry;
     }
-
 
     public int calculateNextQueueNumber(String queueId) {
         return repository.findAllByQueueId(queueId).stream()
@@ -102,6 +97,7 @@ public class QueueEntryService {
                 .max()
                 .orElse(0) + 1;
     }
+
     public List<QueueEntry> getAllEntriesByQueueId(String queueId) {
         return repository.findAllByQueueId(queueId);
     }
@@ -111,6 +107,9 @@ public class QueueEntryService {
         webSocketController.broadcastQueueUpdate(queueId); // Notify clients
     }
 
+    /**
+     * Basic analytics across all records for this queue.
+     */
     public AnalyticsDTO getAnalytics(String queueId) {
         List<QueueEntry> allEntries = repository.findAllByQueueId(queueId);
         List<QueueEntry> servedEntries = allEntries.stream()
@@ -132,37 +131,66 @@ public class QueueEntryService {
         }
 
         long totalServedToday = allEntries.stream()
-                .filter(e -> "called".equalsIgnoreCase(e.getStatus()) && e.getCreatedAt().toLocalDate().isEqual(LocalDate.now()))
+                .filter(e -> "called".equalsIgnoreCase(e.getStatus()) && e.getCreatedAt() != null && e.getCreatedAt().toLocalDate().isEqual(LocalDate.now()))
                 .count();
 
         Map<Integer, Long> trafficByHour = allEntries.stream()
-                .filter(e -> e.getCreatedAt().toLocalDate().isEqual(LocalDate.now()))
+                .filter(e -> e.getCreatedAt() != null && e.getCreatedAt().toLocalDate().isEqual(LocalDate.now()))
                 .collect(Collectors.groupingBy(e -> e.getCreatedAt().getHour(), Collectors.counting()));
 
         return new AnalyticsDTO(avgWaitTime, avgServiceTime, totalServedToday, trafficByHour);
     }
 
-    // NEW METHOD FOR THE BUSINESS DASHBOARD
+    /**
+     * Dashboard analytics intended for the business/admin dashboard.
+     * This computes analytics for today's entries and returns a DashboardAnalyticsDTO.
+     * This method does not depend on any undefined variable and will not break the live-update flow.
+     */
     public DashboardAnalyticsDTO getDashboardAnalytics(String queueId) {
+        // Get today's entries for this queue
         List<QueueEntry> todayEntries = repository.findAllByQueueId(queueId).stream()
-                .filter(e -> e.getCreatedAt().toLocalDate().isEqual(LocalDate.now()))
+                .filter(e -> e.getCreatedAt() != null && e.getCreatedAt().toLocalDate().isEqual(LocalDate.now()))
                 .collect(Collectors.toList());
 
-        // Reuse existing analytics logic
-        AnalyticsDTO basicAnalytics = getAnalytics(queueId);
+        // Traffic by hour (today)
+        Map<Integer, Long> trafficByHour = todayEntries.stream()
+                .collect(Collectors.groupingBy(e -> e.getCreatedAt().getHour(), Collectors.counting()));
 
-        // Calculate peak hour
+        // Determine peak hour (safely handle empty map)
         String peakHour = "N/A";
-        if (!basicAnalytics.getTrafficByHour().isEmpty()) {
-            Optional<Map.Entry<Integer, Long>> peakEntry = basicAnalytics.getTrafficByHour().entrySet().stream()
+        if (trafficByHour != null && !trafficByHour.isEmpty()) {
+            Optional<Map.Entry<Integer, Long>> peakEntry = trafficByHour.entrySet().stream()
                     .max(Map.Entry.comparingByValue());
             if (peakEntry.isPresent()) {
-                int hour = peakEntry.get().getKey();
-                peakHour = LocalDateTime.now().withHour(hour).format(DateTimeFormatter.ofPattern("h a")); // e.g., "2 PM"
+                int hour24 = peakEntry.get().getKey();
+                String amPm = hour24 < 12 ? "AM" : "PM";
+                int hour12 = hour24 % 12;
+                if (hour12 == 0) hour12 = 12;
+                peakHour = hour12 + ":00 " + amPm;
             }
         }
 
-        // Get last 5 recent visitors
+        // Compute avg wait time (minutes) for today's served entries
+        List<QueueEntry> servedToday = todayEntries.stream()
+                .filter(e -> "called".equalsIgnoreCase(e.getStatus()) && e.getCalledAt() != null && e.getCreatedAt() != null)
+                .sorted(Comparator.comparing(QueueEntry::getCalledAt))
+                .collect(Collectors.toList());
+
+        long avgWaitTime = (long) servedToday.stream()
+                .mapToLong(e -> Duration.between(e.getCreatedAt(), e.getCalledAt()).toMinutes())
+                .average().orElse(-1);
+
+        // Compute avg service time (minutes) based on calledAt gaps for today's served entries
+        long avgServiceTime = -1;
+        if (servedToday.size() > 1) {
+            long totalServiceDuration = 0;
+            for (int i = 0; i < servedToday.size() - 1; i++) {
+                totalServiceDuration += Duration.between(servedToday.get(i).getCalledAt(), servedToday.get(i + 1).getCalledAt()).toMinutes();
+            }
+            avgServiceTime = totalServiceDuration / (servedToday.size() - 1);
+        }
+
+        // Last 5 recent visitors (today)
         List<QueueEntry> recentVisitors = todayEntries.stream()
                 .sorted(Comparator.comparing(QueueEntry::getCreatedAt).reversed())
                 .limit(5)
@@ -171,11 +199,10 @@ public class QueueEntryService {
         return new DashboardAnalyticsDTO(
                 todayEntries.size(),
                 peakHour,
-                basicAnalytics.getAverageWaitTimeMinutes(),
-                basicAnalytics.getAverageServiceTimeMinutes(),
-                basicAnalytics.getTrafficByHour(),
+                avgWaitTime,
+                avgServiceTime,
+                trafficByHour,
                 recentVisitors
         );
     }
-
 }
